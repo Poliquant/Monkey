@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Monkeys - Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #1DB954;
+            --primary-light: #4cd97f;
+            --primary-dark: #1AA34A;
+            --secondary: #191414;
+            --accent: #1ED760;
+            --background: #121212;
+            --card-bg: #1f1f1f;
+            --text: #FFFFFF;
+            --text-light: #B3B3B3;
+            --border: #333;
+            --upvote: #1DB954;
+            --downvote: #FF4D4D;
+            --admin-color: #1DB954;
+            --rule-icon: #1DB954;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            padding-top: 70px;
+            background-image: radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.08) 0%, transparent 40%);
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: var(--secondary);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            color: var(--primary);
+            transform: rotate(-5deg);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: rgba(29, 185, 84, 0.15);
+            color: var(--primary);
+        }
+
+        /* Enhanced Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 1rem;
+            margin: 10px 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(29, 185, 84, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(29, 185, 84, 0.1);
+        }
+
+        .btn i {
+            font-size: 0.9em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 5%;
+            display: flex;
+            gap: 30px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(29, 185, 84, 0.2);
+        }
+
+        .welcome-banner h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+
+        .welcome-banner p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .sidebar {
+            width: 320px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            height: fit-content;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar h3 i {
+            background: rgba(29, 185, 84, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .community-rules {
+            list-style: none;
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .rule-icon {
+            background: rgba(29, 185, 84, 0.15);
+            color: var(--primary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .rule-content h4 {
+            margin-bottom: 6px;
+            color: var(--primary-light);
+        }
+
+        .rule-content p {
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .advertise-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 14px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 25px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1.1rem;
+        }
+
+        .advertise-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(29, 185, 84, 0.3);
+        }
+
+        .post {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(29, 185, 84, 0.05);
+        }
+
+        .post-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .post-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .post-content {
+            padding: 25px;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+
+        .post-content p {
+            margin-bottom: 15px;
+        }
+
+        .post-actions {
+            padding: 15px 25px;
+            display: flex;
+            gap: 25px;
+            border-top: 1px solid var(--border);
+            background: rgba(29, 185, 84, 0.05);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.3s;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .upvote:hover {
+            color: var(--upvote);
+        }
+
+        .downvote:hover {
+            color: var(--downvote);
+        }
+
+        .comments-section {
+            padding: 0 25px 25px;
+        }
+
+        .comment-form {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(29, 185, 84, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .comment-form h4 {
+            margin-bottom: 15px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comment-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(18, 18, 18, 0.7);
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(18, 18, 18, 0.7);
+            color: var(--text);
+            min-height: 100px;
+            resize: vertical;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .comment-form button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .comment-form button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+        }
+
+        .comment {
+            background: rgba(29, 185, 84, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            background: linear-gradient(135deg, #4a90e2, #5fa3f0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .comment-user {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .comment-time {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-left: 15px;
+        }
+
+        .comment-content {
+            line-height: 1.6;
+            font-size: 1.05rem;
+            padding-left: 52px;
+        }
+
+        .comment-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 20px;
+            padding-left: 52px;
+        }
+
+        .admin-badge {
+            background: var(--admin-color);
+            color: white;
+            font-size: 0.8rem;
+            padding: 3px 12px;
+            border-radius: 20px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .community-stats {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(29, 185, 84, 0.05);
+            border-radius: 12px;
+        }
+
+        .community-stats h3 {
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .nav-links {
+                gap: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .nav-links a {
+                padding: 6px 10px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 10px;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .welcome-banner {
+                padding: 20px;
+            }
+            
+            .welcome-banner h2 {
+                font-size: 1.8rem;
+            }
+            
+            .post-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification">Your comment has been posted successfully!</div>
+    
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-monkey"></i>
+            <h1>Prompt Monkeys</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="/index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="/chat.html" class="active"><i class="fas fa-comments"></i> Chat</a>
+            <a href="/earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
+            <a href="/advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
+            <a href="/admin-login.html"><i class="fas fa-lock"></i> Admin</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="welcome-banner">
+                <h2>Welcome to Prompt Monkeys Chat</h2>
+                <p>Your trusted source for expert financial insights and market analysis. Join the conversation and stay ahead of market trends.</p>
+                <div style="margin-top: 20px;">
+                    <a href="/earnings.html" class="btn"><i class="fas fa-calendar"></i> View Earnings Calendar</a>
+                    <a href="/advertise.html" class="btn btn-secondary"><i class="fas fa-bullhorn"></i> Advertise With Us</a>
+                </div>
+            </div>
+
+            <!-- Posts will be dynamically loaded from backend -->
+            <div id="postsContainer"></div>
+        </div>
+
+        <div class="sidebar">
+            <h3><i class="fas fa-gavel"></i> Community Rules</h3>
+            <ul class="community-rules">
+                <li class="rule-item">
+                    <div class="rule-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="rule-content">
+                        <h4>Admin-Only Posts</h4>
+                        <p>Only verified admins can create new discussion topics to ensure quality content.</p>
+                    </div>
+                </li>
+                <li class="rule-item">
+                    <div class="rule-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="rule-content">
+                        <h4>Respectful Dialogue</h4>
+                        <p>Maintain a professional and respectful tone in all comments and discussions.</p>
+                    </div>
+                </li>
+                <li class="rule-item">
+                    <div class="rule-icon">
+                        <i class="fas fa-comment-slash"></i>
+                    </div>
+                    <div class="rule-content">
+                        <h4>Back up opinions with facts</h4>
+                        <p>Share insights and analysis, but avoid presenting opinions as financial advice.</p>
+                    </div>
+                </li>
+                <li class="rule-item">
+                    <div class="rule-icon">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <div class="rule-content">
+                        <h4>No Promotions</h4>
+                        <p>Strictly no referral links, promotional content, or unsolicited services.</p>
+                    </div>
+                </li>
+                <li class="rule-item">
+                    <div class="rule-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="rule-content">
+                        <h4>Data-Driven Discussions</h4>
+                        <p>Support claims with data and sources whenever possible for more valuable conversations.</p>
+                    </div>
+                </li>
+            </ul>
+
+            <button class="advertise-btn" onclick="window.location.href='/advertise.html'">
+                <i class="fas fa-bullhorn"></i> Advertise With Us
+            </button>
+            
+            <div class="community-stats">
+                <h3><i class="fas fa-chart-bar"></i> Community Stats</h3>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number" id="totalPosts">0</div>
+                        <div class="stat-label">Total Posts</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="totalComments">0</div>
+                        <div class="stat-label">Total Comments</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to convert ISO timestamps to relative time
+        function timeSince(date) {
+            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + " years ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + " months ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " days ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " hours ago";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " minutes ago";
+            return Math.floor(seconds) + " seconds ago";
+        }
+
+        // API object to handle backend requests
+        const api = {
+            async getPosts() {
+                const res = await fetch('/posts');
+                if (!res.ok) throw new Error('Failed to fetch posts');
+                return res.json();
+            },
+            async addComment(postId, comment) {
+                const res = await fetch(`/posts/${postId}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(comment)
+                });
+                if (!res.ok) throw new Error('Failed to add comment');
+                return res.json();
+            },
+            async upvotePost(postId) {
+                const res = await fetch(`/posts/${postId}/upvote`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to upvote post');
+                return res.json();
+            },
+            async downvotePost(postId) {
+                const res = await fetch(`/posts/${postId}/downvote`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to downvote post');
+                return res.json();
+            },
+            async upvoteComment(commentId) {
+                const res = await fetch(`/comments/${commentId}/upvote`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to upvote comment');
+                return res.json();
+            },
+            async downvoteComment(commentId) {
+                const res = await fetch(`/comments/${commentId}/downvote`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to downvote comment');
+                return res.json();
+            },
+            async getStats() {
+                const res = await fetch('/stats');
+                if (!res.ok) throw new Error('Failed to fetch stats');
+                return res.json();
+            }
+        };
+
+        // UI Controller
+        const uiController = {
+            async renderPosts() {
+                try {
+                    const posts = await api.getPosts();
+                    const postsContainer = document.getElementById('postsContainer');
+                    postsContainer.innerHTML = '';
+                    
+                    if (posts.length === 0) {
+                        postsContainer.innerHTML = `
+                            <div class="post">
+                                <div class="post-content" style="text-align: center; padding: 50px 20px;">
+                                    <h3 style="color: var(--primary); margin-bottom: 20px;">No Posts Yet</h3>
+                                    <p>Check back later for new financial insights!</p>
+                                    <a href="/admin-login.html" class="btn" style="margin-top: 20px;">
+                                        <i class="fas fa-lock"></i> Admin Login
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    posts.forEach(post => {
+                        const postElement = document.createElement('div');
+                        postElement.className = 'post';
+                        postElement.innerHTML = `
+                            <div class="post-header">
+                                <div class="post-avatar">PM</div>
+                                <div class="post-info">
+                                    <div class="post-title">${post.title}</div>
+                                    <div class="post-meta">
+                                        <span>Posted by <strong>${post.author}</strong></span>
+                                        <span class="admin-badge">ADMIN</span>
+                                        <span>•</span>
+                                        <span>${timeSince(post.timestamp)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="post-content">
+                                ${post.content.replace(/\n/g, '<br>')}
+                            </div>
+                            <div class="post-actions">
+                                <div class="stat-item upvote" data-post="${post.id}">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span class="vote-count">${post.upvotes}</span>
+                                </div>
+                                <div class="stat-item downvote" data-post="${post.id}">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span class="vote-count">${post.downvotes}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-comment"></i>
+                                    <span>${post.comments.length} comments</span>
+                                </div>
+                            </div>
+                            <div class="comments-section">
+                                <div class="comment-form" data-post="${post.id}">
+                                    <h4><i class="fas fa-comment-dots"></i> Add a Comment</h4>
+                                    <input type="text" class="comment-author" placeholder="Your name (optional)">
+                                    <textarea placeholder="Share your thoughts..."></textarea>
+                                    <button class="btn"><i class="fas fa-paper-plane"></i> Post Comment</button>
+                                </div>
+                                <div class="comments-list" id="comments-${post.id}"></div>
+                            </div>
+                        `;
+                        
+                        postsContainer.appendChild(postElement);
+                        
+                        this.renderComments(post.id, post.comments);
+                    });
+                    
+                    this.updateStats();
+                    this.attachEventListeners();
+                } catch (error) {
+                    console.error('Error rendering posts:', error);
+                    this.showNotification('Failed to load posts. Please try again later.');
+                }
+            },
+            
+            renderComments(postId, comments) {
+                const commentsList = document.getElementById(`comments-${postId}`);
+                if (!commentsList) return;
+                
+                commentsList.innerHTML = '';
+                
+                if (comments.length === 0) {
+                    commentsList.innerHTML = `
+                        <div class="comment">
+                            <div class="comment-content" style="text-align: center; padding: 20px;">
+                                No comments yet. Be the first to share your thoughts!
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                comments.forEach(comment => {
+                    const commentElement = document.createElement('div');
+                    commentElement.className = 'comment';
+                    commentElement.innerHTML = `
+                        <div class="comment-header">
+                            <div class="comment-avatar">${comment.author.charAt(0)}</div>
+                            <div class="comment-user">${comment.author}</div>
+                            <div class="comment-time">${timeSince(comment.timestamp)}</div>
+                        </div>
+                        <div class="comment-content">
+                            <p>${comment.content}</p>
+                        </div>
+                        <div class="comment-actions">
+                            <div class="stat-item upvote" data-comment="${comment.id}">
+                                <i class="fas fa-arrow-up"></i>
+                                <span class="vote-count">${comment.upvotes}</span>
+                            </div>
+                            <div class="stat-item downvote" data-comment="${comment.id}">
+                                <i class="fas fa-arrow-down"></i>
+                                <span class="vote-count">${comment.downvotes}</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    commentsList.appendChild(commentElement);
+                });
+            },
+            
+            async updateStats() {
+                try {
+                    const stats = await api.getStats();
+                    document.getElementById('totalPosts').textContent = stats.totalPosts;
+                    document.getElementById('totalComments').textContent = stats.totalComments;
+                } catch (error) {
+                    console.error('Error updating stats:', error);
+                }
+            },
+            
+            showNotification(message) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            },
+            
+            attachEventListeners() {
+                document.querySelectorAll('.upvote[data-post]').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        if (button.classList.contains('voted')) return;
+                        
+                        const postId = parseInt(button.getAttribute('data-post'));
+                        try {
+                            const result = await api.upvotePost(postId);
+                            const newCount = result.upvotes;
+                            const countElement = button.querySelector('.vote-count');
+                            countElement.textContent = newCount;
+                            
+                            button.classList.add('voted');
+                            button.style.color = 'var(--upvote)';
+                            setTimeout(() => {
+                                button.style.color = '';
+                            }, 300);
+                        } catch (error) {
+                            console.error('Error upvoting post:', error);
+                            this.showNotification('Failed to upvote post.');
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.downvote[data-post]').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        if (button.classList.contains('voted')) return;
+                        
+                        const postId = parseInt(button.getAttribute('data-post'));
+                        try {
+                            const result = await api.downvotePost(postId);
+                            const newCount = result.downvotes;
+                            const countElement = button.querySelector('.vote-count');
+                            countElement.textContent = newCount;
+                            
+                            button.classList.add('voted');
+                            button.style.color = 'var(--downvote)';
+                            setTimeout(() => {
+                                button.style.color = '';
+                            }, 300);
+                        } catch (error) {
+                            console.error('Error downvoting post:', error);
+                            this.showNotification('Failed to downvote post.');
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.upvote[data-comment]').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        if (button.classList.contains('voted')) return;
+                        
+                        const commentId = parseInt(button.getAttribute('data-comment'));
+                        try {
+                            const result = await api.upvoteComment(commentId);
+                            const newCount = result.upvotes;
+                            const countElement = button.querySelector('.vote-count');
+                            countElement.textContent = newCount;
+                            
+                            button.classList.add('voted');
+                            button.style.color = 'var(--upvote)';
+                            setTimeout(() => {
+                                button.style.color = '';
+                            }, 300);
+                        } catch (error) {
+                            console.error('Error upvoting comment:', error);
+                            this.showNotification('Failed to upvote comment.');
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.downvote[data-comment]').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        if (button.classList.contains('voted')) return;
+                        
+                        const commentId = parseInt(button.getAttribute('data-comment'));
+                        try {
+                            const result = await api.downvoteComment(commentId);
+                            const newCount = result.downvotes;
+                            const countElement = button.querySelector('.vote-count');
+                            countElement.textContent = newCount;
+                            
+                            button.classList.add('voted');
+                            button.style.color = 'var(--downvote)';
+                            setTimeout(() => {
+                                button.style.color = '';
+                            }, 300);
+                        } catch (error) {
+                            console.error('Error downvoting comment:', error);
+                            this.showNotification('Failed to downvote comment.');
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.comment-form button').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        const form = this.closest('.comment-form');
+                        const postId = parseInt(form.getAttribute('data-post'));
+                        const authorInput = form.querySelector('.comment-author');
+                        const textarea = form.querySelector('textarea');
+                        const author = authorInput.value.trim() || "user_" + Math.floor(Math.random() * 10000);
+                        const content = textarea.value.trim();
+                        
+                        if (content) {
+                            try {
+                                await api.addComment(postId, { author, content });
+                                uiController.renderPosts();
+                                uiController.showNotification("Your comment has been posted!");
+                            } catch (error) {
+                                console.error('Error adding comment:', error);
+                                uiController.showNotification("Failed to post comment.");
+                            }
+                        } else {
+                            uiController.showNotification("Please enter a comment before submitting.");
+                        }
+                    });
+                });
+            }
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            uiController.renderPosts().catch(console.error);
+        });
+    </script>
+</body>
+</html>
