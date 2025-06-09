@@ -654,11 +654,11 @@
             <h1>Prompt Monkeys</h1>
         </div>
         <nav class="nav-links">
-            <a href="/index.html"><i class="fas fa-home"></i> Home</a>
-            <a href="/chat.html" class="active"><i class="fas fa-comments"></i> Chat</a>
-            <a href="/earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
-            <a href="/advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
-            <a href="/admin-login.html"><i class="fas fa-lock"></i> Admin</a>
+            <a href="index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="chat.html" class="active"><i class="fas fa-comments"></i> Chat</a>
+            <a href="earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
+            <a href="advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
+            <a href="admin-login.html"><i class="fas fa-lock"></i> Admin</a>
         </nav>
     </header>
 
@@ -722,7 +722,7 @@
                 </li>
             </ul>
 
-            <button class="advertise-btn" onclick="window.location.href='/advertise.html'">
+            <button class="advertise-btn" onclick="window.location.href='advertise.html'">
                 <i class="fas fa-bullhorn"></i> Advertise With Us
             </button>
             
@@ -743,69 +743,6 @@
     </div>
 
     <script>
-        // Supabase Client Initialization (Replace with your Supabase URL and Key)
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g., 'https://your-project-id.supabase.co'
-        const SUPABASE_KEY = 'YOUR_SUPABASE_PUBLIC_ANON_KEY';
-        const supabase = {
-            createClient: (url, key) => ({
-                from: (table) => ({
-                    select: async (columns) => {
-                        try {
-                            const response = await fetch(`${url}/rest/v1/${table}?select=${columns}`, {
-                                headers: {
-                                    'apikey': key,
-                                    'Authorization': `Bearer ${key}`,
-                                    'Content-Type': 'application/json'
-                                }
-                            });
-                            if (!response.ok) throw new Error(`Failed to fetch ${table}`);
-                            return { data: await response.json(), error: null };
-                        } catch (error) {
-                            return { data: null, error };
-                        }
-                    },
-                    insert: async (data) => {
-                        try {
-                            const response = await fetch(`${url}/rest/v1/${table}`, {
-                                method: 'POST',
-                                headers: {
-                                    'apikey': key,
-                                    'Authorization': `Bearer ${key}`,
-                                    'Content-Type': 'application/json',
-                                    'Prefer': 'return=representation'
-                                },
-                                body: JSON.stringify(data)
-                            });
-                            if (!response.ok) throw new Error(`Failed to insert into ${table}`);
-                            return { data: await response.json(), error: null };
-                        } catch (error) {
-                            return { data: null, error };
-                        }
-                    },
-                    update: async (data, id) => {
-                        try {
-                            const response = await fetch(`${url}/rest/v1/${table}?id=eq.${id}`, {
-                                method: 'PATCH',
-                                headers: {
-                                    'apikey': key,
-                                    'Authorization': `Bearer ${key}`,
-                                    'Content-Type': 'application/json',
-                                    'Prefer': 'return=representation'
-                                },
-                                body: JSON.stringify(data)
-                            });
-                            if (!response.ok) throw new Error(`Failed to update ${table}`);
-                            return { data: await response.json(), error: null };
-                        } catch (error) {
-                            return { data: null, error };
-                        }
-                    }
-                })
-            })
-        };
-
-        const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
         // Time formatting function
         function timeSince(date) {
             const seconds = Math.floor((new Date() - new Date(date)) / 1000);
@@ -822,137 +759,128 @@
             return Math.floor(seconds) + " seconds ago";
         }
 
-        // API object for Supabase interactions
-        const api = {
-            async getPosts() {
-                const { data, error } = await client.from('posts').select('id, title, author, content, upvotes, downvotes, created_at, comments(id, author, content, upvotes, downvotes, created_at)');
-                if (error) throw new Error(error.message);
-                return data;
+        // Sample data for demonstration
+        const samplePosts = [
+            {
+                id: 1,
+                title: "Bitcoin Analysis: Bullish Signals Emerging",
+                author: "admin",
+                content: "Recent on-chain data shows accumulation by large holders. The Puell Multiple suggests we're in the early stages of a new bull market. Key resistance at $65K needs to be broken for confirmation.\n\nThe current market sentiment is positive, with increasing institutional interest and growing adoption in emerging markets. However, regulatory developments remain a key factor to watch in the coming months.",
+                upvotes: 42,
+                downvotes: 3,
+                created_at: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+                comments: [
+                    {
+                        id: 1,
+                        author: "crypto_trader",
+                        content: "Interesting analysis. What's your price target for EOY? I'm particularly interested in how the halving event might impact the price trajectory.",
+                        upvotes: 5,
+                        downvotes: 0,
+                        created_at: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
+                    },
+                    {
+                        id: 2,
+                        author: "market_watcher",
+                        content: "Don't forget about miner capitulation risk if price drops below $58K. The hash rate has been fluctuating recently, which could indicate some stress in the mining sector.",
+                        upvotes: 3,
+                        downvotes: 1,
+                        created_at: new Date(Date.now() - 2700000).toISOString() // 45 minutes ago
+                    }
+                ]
             },
-            async addComment(postId, comment) {
-                const { data, error } = await client.from('comments').insert({
-                    post_id: postId,
-                    author: comment.author,
-                    content: comment.content,
-                    upvotes: 0,
-                    downvotes: 0,
-                    created_at: new Date().toISOString()
-                });
-                if (error) throw new Error(error.message);
-                return data[0];
-            },
-            async upvotePost(postId) {
-                const { data: current } = await client.from('posts').select('upvotes').select('*');
-                const { data, error } = await client.from('posts').update({ upvotes: current[0].upvotes + 1 }).select('*');
-                if (error) throw new Error(error.message);
-                return data[0];
-            },
-            async downvotePost(postId) {
-                const { data: current } = await client.from('posts').select('downvotes').select('*');
-                const { data, error } = await client.from('posts').update({ downvotes: current[0].downvotes + 1 }).select('*');
-                if (error) throw new Error(error.message);
-                return data[0];
-            },
-            async upvoteComment(commentId) {
-                const { data: current } = await client.from('comments').select('upvotes').select('*');
-                const { data, error } = await client.from('comments').update({ upvotes: current[0].upvotes + 1 }).select('*');
-                if (error) throw new Error(error.message);
-                return data[0];
-            },
-            async downvoteComment(commentId) {
-                const { data: current } = await client.from('comments').select('downvotes').select('*');
-                const { data, error } = await client.from('comments').update({ downvotes: current[0].downvotes + 1 }).select('*');
-                if (error) throw new Error(error.message);
-                return data[0];
-            },
-            async getStats() {
-                const { data: posts } = await client.from('posts').select('id');
-                const { data: comments } = await client.from('comments').select('id');
-                return {
-                    totalPosts: posts ? posts.length : 0,
-                    totalComments: comments ? comments.length : 0
-                };
+            {
+                id: 2,
+                title: "Upcoming Tech Earnings Preview",
+                author: "admin",
+                content: "Big tech earnings next week. Focus on cloud growth rates and AI monetization. My predictions:\n\n- MSFT: Likely to beat expectations due to Azure growth\n- META: In-line with projections, focus on Reels monetization\n- GOOGL: Slight miss on ad revenue but strong cloud performance\n- AMZN: AWS growth accelerating, retail margins improving\n\nThe key metrics to watch will be guidance for Q3 and any commentary on AI investments and returns.",
+                upvotes: 28,
+                downvotes: 7,
+                created_at: new Date(Date.now() - 18000000).toISOString(), // 5 hours ago
+                comments: [
+                    {
+                        id: 3,
+                        author: "investor123",
+                        content: "Agree on MSFT. Their AI products are seeing strong enterprise adoption. I've heard from several CIOs that they're increasing their Azure budgets specifically for AI workloads.",
+                        upvotes: 8,
+                        downvotes: 2,
+                        created_at: new Date(Date.now() - 10800000).toISOString() // 3 hours ago
+                    }
+                ]
             }
-        };
+        ];
 
         // UI Controller
         const uiController = {
-            async renderPosts() {
-                try {
-                    const posts = await api.getPosts();
-                    const postsContainer = document.getElementById('postsContainer');
-                    postsContainer.innerHTML = '';
-                    
-                    if (posts.length === 0) {
-                        postsContainer.innerHTML = `
-                            <div class="post">
-                                <div class="post-content" style="text-align: center; padding: 60px 25px;">
-                                    <h3 style="color: var(--primary); margin-bottom: 25px;">No Posts Yet</h3>
-                                    <p>Check back later for new financial insights!</p>
-                                    <a href="/admin-login.html" class="btn" style="margin-top: 25px;">
-                                        <i class="fas fa-lock"></i> Admin Login
-                                    </a>
-                                </div>
+            renderPosts() {
+                const postsContainer = document.getElementById('postsContainer');
+                postsContainer.innerHTML = '';
+                
+                if (samplePosts.length === 0) {
+                    postsContainer.innerHTML = `
+                        <div class="post">
+                            <div class="post-content" style="text-align: center; padding: 60px 25px;">
+                                <h3 style="color: var(--primary); margin-bottom: 25px;">No Posts Yet</h3>
+                                <p>Check back later for new financial insights!</p>
+                                <a href="admin-login.html" class="btn" style="margin-top: 25px;">
+                                    <i class="fas fa-lock"></i> Admin Login
+                                </a>
                             </div>
-                        `;
-                        return;
-                    }
-                    
-                    posts.forEach(post => {
-                        const postElement = document.createElement('div');
-                        postElement.className = 'post';
-                        postElement.innerHTML = `
-                            <div class="post-header">
-                                <div class="post-avatar">PM</div>
-                                <div class="post-info">
-                                    <div class="post-title">${post.title}</div>
-                                    <div class="post-meta">
-                                        <span>Posted by <strong>${post.author}</strong></span>
-                                        <span class="admin-badge">ADMIN</span>
-                                        <span>•</span>
-                                        <span>${timeSince(post.created_at)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="post-content">
-                                ${post.content.replace(/\n/g, '<br>')}
-                            </div>
-                            <div class="post-actions">
-                                <div class="stat-item upvote" data-post="${post.id}">
-                                    <i class="fas fa-arrow-up"></i>
-                                    <span class="vote-count">${post.upvotes}</span>
-                                </div>
-                                <div class="stat-item downvote" data-post="${post.id}">
-                                    <i class="fas fa-arrow-down"></i>
-                                    <span class="vote-count">${post.downvotes}</span>
-                                </div>
-                                <div class="stat-item">
-                                    <i class="fas fa-comment"></i>
-                                    <span>${post.comments.length} comments</span>
-                                </div>
-                            </div>
-                            <div class="comments-section">
-                                <div class="comment-form" data-post="${post.id}">
-                                    <h4><i class="fas fa-comment-dots"></i> Add a Comment</h4>
-                                    <input type="text" class="comment-author" placeholder="Your name (optional)">
-                                    <textarea placeholder="Share your thoughts..."></textarea>
-                                    <button class="btn"><i class="fas fa-paper-plane"></i> Post Comment</button>
-                                </div>
-                                <div class="comments-list" id="comments-${post.id}"></div>
-                            </div>
-                        `;
-                        
-                        postsContainer.appendChild(postElement);
-                        
-                        this.renderComments(post.id, post.comments);
-                    });
-                    
-                    this.updateStats();
-                    this.attachEventListeners();
-                } catch (error) {
-                    console.error('Error rendering posts:', error);
-                    this.showNotification('Failed to load posts. Please try again later.');
+                        </div>
+                    `;
+                    return;
                 }
+                
+                samplePosts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.className = 'post';
+                    postElement.innerHTML = `
+                        <div class="post-header">
+                            <div class="post-avatar">PM</div>
+                            <div class="post-info">
+                                <div class="post-title">${post.title}</div>
+                                <div class="post-meta">
+                                    <span>Posted by <strong>${post.author}</strong></span>
+                                    <span class="admin-badge">ADMIN</span>
+                                    <span>•</span>
+                                    <span>${timeSince(post.created_at)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            ${post.content.replace(/\n/g, '<br>')}
+                        </div>
+                        <div class="post-actions">
+                            <div class="stat-item upvote" data-post="${post.id}">
+                                <i class="fas fa-arrow-up"></i>
+                                <span class="vote-count">${post.upvotes}</span>
+                            </div>
+                            <div class="stat-item downvote" data-post="${post.id}">
+                                <i class="fas fa-arrow-down"></i>
+                                <span class="vote-count">${post.downvotes}</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-comment"></i>
+                                <span>${post.comments.length} comments</span>
+                            </div>
+                        </div>
+                        <div class="comments-section">
+                            <div class="comment-form" data-post="${post.id}">
+                                <h4><i class="fas fa-comment-dots"></i> Add a Comment</h4>
+                                <input type="text" class="comment-author" placeholder="Your name (optional)">
+                                <textarea placeholder="Share your thoughts..."></textarea>
+                                <button class="btn"><i class="fas fa-paper-plane"></i> Post Comment</button>
+                            </div>
+                            <div class="comments-list" id="comments-${post.id}"></div>
+                        </div>
+                    `;
+                    
+                    postsContainer.appendChild(postElement);
+                    
+                    this.renderComments(post.id, post.comments);
+                });
+                
+                this.updateStats();
+                this.attachEventListeners();
             },
             
             renderComments(postId, comments) {
@@ -1000,14 +928,10 @@
                 });
             },
             
-            async updateStats() {
-                try {
-                    const stats = await api.getStats();
-                    document.getElementById('totalPosts').textContent = stats.totalPosts;
-                    document.getElementById('totalComments').textContent = stats.totalComments;
-                } catch (error) {
-                    console.error('Error updating stats:', error);
-                }
+            updateStats() {
+                const totalComments = samplePosts.reduce((sum, post) => sum + post.comments.length, 0);
+                document.getElementById('totalPosts').textContent = samplePosts.length;
+                document.getElementById('totalComments').textContent = totalComments;
             },
             
             showNotification(message) {
@@ -1026,20 +950,17 @@
                         if (button.classList.contains('voted')) return;
                         
                         const postId = parseInt(button.getAttribute('data-post'));
-                        try {
-                            const result = await api.upvotePost(postId);
-                            const newCount = result.upvotes;
+                        const post = samplePosts.find(p => p.id === postId);
+                        if (post) {
+                            post.upvotes++;
                             const countElement = button.querySelector('.vote-count');
-                            countElement.textContent = newCount;
+                            countElement.textContent = post.upvotes;
                             
                             button.classList.add('voted');
                             button.style.color = 'var(--upvote)';
                             setTimeout(() => {
                                 button.style.color = '';
                             }, 300);
-                        } catch (error) {
-                            console.error('Error upvoting post:', error);
-                            this.showNotification('Failed to upvote post.');
                         }
                     });
                 });
@@ -1049,20 +970,17 @@
                         if (button.classList.contains('voted')) return;
                         
                         const postId = parseInt(button.getAttribute('data-post'));
-                        try {
-                            const result = await api.downvotePost(postId);
-                            const newCount = result.downvotes;
+                        const post = samplePosts.find(p => p.id === postId);
+                        if (post) {
+                            post.downvotes++;
                             const countElement = button.querySelector('.vote-count');
-                            countElement.textContent = newCount;
+                            countElement.textContent = post.downvotes;
                             
                             button.classList.add('voted');
                             button.style.color = 'var(--downvote)';
                             setTimeout(() => {
                                 button.style.color = '';
                             }, 300);
-                        } catch (error) {
-                            console.error('Error downvoting post:', error);
-                            this.showNotification('Failed to downvote post.');
                         }
                     });
                 });
@@ -1072,20 +990,20 @@
                         if (button.classList.contains('voted')) return;
                         
                         const commentId = parseInt(button.getAttribute('data-comment'));
-                        try {
-                            const result = await api.upvoteComment(commentId);
-                            const newCount = result.upvotes;
-                            const countElement = button.querySelector('.vote-count');
-                            countElement.textContent = newCount;
-                            
-                            button.classList.add('voted');
-                            button.style.color = 'var(--upvote)';
-                            setTimeout(() => {
-                                button.style.color = '';
-                            }, 300);
-                        } catch (error) {
-                            console.error('Error upvoting comment:', error);
-                            this.showNotification('Failed to upvote comment.');
+                        for (const post of samplePosts) {
+                            const comment = post.comments.find(c => c.id === commentId);
+                            if (comment) {
+                                comment.upvotes++;
+                                const countElement = button.querySelector('.vote-count');
+                                countElement.textContent = comment.upvotes;
+                                
+                                button.classList.add('voted');
+                                button.style.color = 'var(--upvote)';
+                                setTimeout(() => {
+                                    button.style.color = '';
+                                }, 300);
+                                break;
+                            }
                         }
                     });
                 });
@@ -1095,26 +1013,26 @@
                         if (button.classList.contains('voted')) return;
                         
                         const commentId = parseInt(button.getAttribute('data-comment'));
-                        try {
-                            const result = await api.downvoteComment(commentId);
-                            const newCount = result.downvotes;
-                            const countElement = button.querySelector('.vote-count');
-                            countElement.textContent = newCount;
-                            
-                            button.classList.add('voted');
-                            button.style.color = 'var(--downvote)';
-                            setTimeout(() => {
-                                button.style.color = '';
-                            }, 300);
-                        } catch (error) {
-                            console.error('Error downvoting comment:', error);
-                            this.showNotification('Failed to downvote comment.');
+                        for (const post of samplePosts) {
+                            const comment = post.comments.find(c => c.id === commentId);
+                            if (comment) {
+                                comment.downvotes++;
+                                const countElement = button.querySelector('.vote-count');
+                                countElement.textContent = comment.downvotes;
+                                
+                                button.classList.add('voted');
+                                button.style.color = 'var(--downvote)';
+                                setTimeout(() => {
+                                    button.style.color = '';
+                                }, 300);
+                                break;
+                            }
                         }
                     });
                 });
                 
                 document.querySelectorAll('.comment-form button').forEach(button => {
-                    button.addEventListener('click', async function() {
+                    button.addEventListener('click', function() {
                         const form = this.closest('.comment-form');
                         const postId = parseInt(form.getAttribute('data-post'));
                         const authorInput = form.querySelector('.comment-author');
@@ -1123,13 +1041,21 @@
                         const content = textarea.value.trim();
                         
                         if (content) {
-                            try {
-                                await api.addComment(postId, { author, content });
+                            const post = samplePosts.find(p => p.id === postId);
+                            if (post) {
+                                const newComment = {
+                                    id: Math.max(...post.comments.map(c => c.id), 0) + 1,
+                                    author,
+                                    content,
+                                    upvotes: 0,
+                                    downvotes: 0,
+                                    created_at: new Date().toISOString()
+                                };
+                                post.comments.unshift(newComment);
                                 uiController.renderPosts();
                                 uiController.showNotification("Your comment has been posted!");
-                            } catch (error) {
-                                console.error('Error adding comment:', error);
-                                uiController.showNotification("Failed to post comment.");
+                                textarea.value = '';
+                                authorInput.value = '';
                             }
                         } else {
                             uiController.showNotification("Please enter a comment before submitting.");
@@ -1141,7 +1067,7 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
-            uiController.renderPosts().catch(console.error);
+            uiController.renderPosts();
         });
     </script>
 </body>
