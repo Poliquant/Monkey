@@ -188,59 +188,6 @@
             position: relative;
         }
 
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            position: relative;
-        }
-
-        .welcome-banner .btn {
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid var(--primary);
-            color: var(--primary-light);
-            backdrop-filter: blur(5px);
-            transition: all 0.3s ease;
-            padding: 14px 28px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .welcome-banner .btn:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(29, 185, 84, 0.4);
-            border-color: var(--primary-light);
-        }
-
-        .welcome-banner .btn-secondary {
-            background: rgba(29, 185, 84, 0.15);
-            border: 2px solid var(--primary-light);
-            color: var(--primary-light);
-        }
-
-        .welcome-banner .btn-secondary:hover {
-            background: var(--primary-dark);
-            color: white;
-            border-color: white;
-        }
-
-        .welcome-btn {
-            padding: 12px 25px;
-            font-size: 1rem;
-            border-radius: 25px;
-            min-width: 200px;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .welcome-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
         .sidebar {
             width: 350px;
             background-color: var(--card-bg);
@@ -643,14 +590,6 @@
             .nav-links a {
                 padding: 8px 12px;
             }
-            
-            .button-group {
-                gap: 15px;
-            }
-            
-            .welcome-btn {
-                min-width: 160px;
-            }
         }
 
         @media (max-width: 600px) {
@@ -691,17 +630,6 @@
                 font-size: 1.1rem;
             }
             
-            .button-group {
-                flex-direction: column;
-                gap: 12px;
-            }
-            
-            .welcome-btn {
-                width: 100%;
-                max-width: 280px;
-                padding: 12px 20px;
-            }
-            
             .post-actions {
                 flex-direction: column;
                 gap: 15px;
@@ -726,11 +654,11 @@
             <h1>Prompt Monkeys</h1>
         </div>
         <nav class="nav-links">
-            <a href="https://poliquant.github.io/monkey/index.html"><i class="fas fa-home"></i> Home</a>
-            <a href="https://poliquant.github.io/monkey/chat.html" class="active"><i class="fas fa-comments"></i> Chat</a>
-            <a href="https://poliquant.github.io/monkey/earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
-            <a href="https://poliquant.github.io/monkey/advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
-            <a href="https://poliquant.github.io/monkey/admin-login.html"><i class="fas fa-lock"></i> Admin</a>
+            <a href="/index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="/chat.html" class="active"><i class="fas fa-comments"></i> Chat</a>
+            <a href="/earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
+            <a href="/advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
+            <a href="/admin-login.html"><i class="fas fa-lock"></i> Admin</a>
         </nav>
     </header>
 
@@ -739,10 +667,6 @@
             <div class="welcome-banner">
                 <h2>Welcome to Prompt Monkeys Chat</h2>
                 <p>Your trusted source for expert financial insights and market analysis. Join the conversation and stay ahead of market trends.</p>
-                <div class="button-group">
-                    <a href="https://poliquant.github.io/monkey/earnings.html" class="btn welcome-btn"><i class="fas fa-calendar"></i> View Earnings Calendar</a>
-                    <a href="https://poliquant.github.io/monkey/advertise.html" class="btn btn-secondary welcome-btn"><i class="fas fa-bullhorn"></i> Advertise With Us</a>
-                </div>
             </div>
 
             <div id="postsContainer"></div>
@@ -798,7 +722,7 @@
                 </li>
             </ul>
 
-            <button class="advertise-btn" onclick="window.location.href='https://poliquant.github.io/monkey/advertise.html'">
+            <button class="advertise-btn" onclick="window.location.href='/advertise.html'">
                 <i class="fas fa-bullhorn"></i> Advertise With Us
             </button>
             
@@ -965,7 +889,7 @@
                                 <div class="post-content" style="text-align: center; padding: 60px 25px;">
                                     <h3 style="color: var(--primary); margin-bottom: 25px;">No Posts Yet</h3>
                                     <p>Check back later for new financial insights!</p>
-                                    <a href="https://poliquant.github.io/monkey/admin-login.html" class="btn" style="margin-top: 25px;">
+                                    <a href="/admin-login.html" class="btn" style="margin-top: 25px;">
                                         <i class="fas fa-lock"></i> Admin Login
                                     </a>
                                 </div>
