@@ -238,7 +238,6 @@
         gap: 15px;
         font-size: 0.95rem;
       }
-      
       .nav-links a {
         padding: 8px 12px;
       }
@@ -249,18 +248,15 @@
         gap: 20px;
         padding: 20px 3%;
       }
-      
       .nav-links {
         width: 100%;
         justify-content: center;
         flex-wrap: wrap;
         gap: 10px;
       }
-      
       .logo h1 {
         font-size: 1.6rem;
       }
-      
       .logo i {
         font-size: 1.6rem;
       }
@@ -338,6 +334,12 @@
           <div class="error-message" id="confirm-password-error">Passwords do not match</div>
         </div>
 
+        <div class="form-group">
+          <label for="avatar">Profile Picture (Optional)</label>
+          <input type="file" id="avatar" class="form-control" accept="image/*">
+          <div class="error-message" id="avatar-error">Failed to upload avatar</div>
+        </div>
+
         <button type="submit" class="btn"><i class="fas fa-user-plus"></i> Sign Up</button>
       </form>
 
@@ -355,15 +357,15 @@
     <div class="footer-links">
       <a href="about.html">About Us</a>
       <a href="privacy.html">Privacy Policy</a>
-      <a href="terms.html">Terms of Service</a>
+      <a href="terms.html">Terms</a>
       <a href="contact.html">Contact</a>
       <a href="faq.html">FAQ</a>
     </div>
     <div class="social-links">
-      <a href="#"><i class="fab fa-twitter"></i></a>
-      <a href="#"><i class="fab fa-discord"></i></a>
-      <a href="#"><i class="fab fa-linkedin"></i></a>
-      <a href="#"><i class="fab fa-youtube"></i></a>
+      <a href="https://x.com"><i class="fab fa-twitter"></i></a>
+      <a href="https://discord.com"><i class="fab fa-discord"></i></a>
+      <a href="https://linkedin.com"><i class="fab fa-linkedin"></i></a>
+      <a href="https://youtube.com"><i class="fab fa-youtube"></i></a>
     </div>
   </footer>
 
@@ -371,7 +373,7 @@
     // Initialize Supabase client
     const supabase = supabase.createClient(
       'https://tdwerbqbgcmszolvjvca.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' // Replace with your Public Anon Key
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8'
     );
 
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
@@ -382,12 +384,14 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirm-password').value;
+      const avatarInput = document.getElementById('avatar');
       
       // Get error elements
       const usernameError = document.getElementById('username-error');
       const emailError = document.getElementById('email-error');
       const passwordError = document.getElementById('password-error');
       const confirmPasswordError = document.getElementById('confirm-password-error');
+      const avatarError = document.getElementById('avatar-error');
       
       let isValid = true;
       
@@ -396,6 +400,7 @@
       emailError.style.display = 'none';
       passwordError.style.display = 'none';
       confirmPasswordError.style.display = 'none';
+      avatarError.style.display = 'none';
       
       // Username validation
       if (!username || username.length < 3) {
@@ -438,8 +443,33 @@
             emailError.style.display = 'block';
             console.error('Sign-up error:', error.message);
           } else {
-            alert('Sign-up successful! Please check your email to verify your account.');
-            window.location.href = 'login.html';
+            // Insert username into users table
+            const { error: userError } = await supabase
+              .from('users')
+              .insert({ id: data.user.id, username: username });
+
+            if (userError) {
+              emailError.textContent = userError.message;
+              emailError.style.display = 'block';
+              console.error('Users table error:', userError.message);
+            } else {
+              // Upload avatar if provided
+              if (avatarInput.files[0]) {
+                console.log('Uploading avatar:', avatarInput.files[0].name);
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                  .from('avatars')
+                  .upload(`${data.user.id}/${avatarInput.files[0].name}`, avatarInput.files[0]);
+                if (uploadError) {
+                  avatarError.textContent = uploadError.message;
+                  avatarError.style.display = 'block';
+                  console.error('Avatar upload error:', uploadError.message);
+                } else {
+                  console.log('Avatar uploaded:', uploadData.path);
+                }
+              }
+              alert('Sign-up successful! Please check your email to verify your account.');
+              window.location.href = 'login.html';
+            }
           }
         } catch (err) {
           emailError.textContent = 'An error occurred. Please try again.';
