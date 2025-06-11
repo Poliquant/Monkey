@@ -43,48 +43,54 @@
       top: 0;
       width: 100%;
       z-index: 100;
-      padding: 15px 5%;
+      padding: 20px 5%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid var(--primary);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      border-bottom: 3px solid var(--primary);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
     .logo {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 15px;
     }
     .logo h1 {
       color: var(--primary);
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: 700;
+      letter-spacing: -0.5px;
     }
     .logo i {
-      font-size: 1.8rem;
+      font-size: 2rem;
       color: var(--primary);
       transform: rotate(-5deg);
+      transition: transform 0.3s;
+    }
+    .logo i:hover {
+      transform: rotate(5deg);
     }
     .nav-links {
       display: flex;
-      gap: 15px;
+      gap: 20px;
     }
     .nav-links a {
       color: var(--text-light);
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s;
-      padding: 8px 12px;
-      border-radius: 20px;
+      padding: 10px 15px;
+      border-radius: 25px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.95rem;
+      gap: 10px;
+      font-size: 1rem;
     }
     .nav-links a:hover,
     .nav-links a.active {
-      background-color: rgba(29, 185, 84, 0.15);
+      background-color: rgba(29, 185, 84, 0.2);
       color: var(--primary);
+      transform: scale(1.05);
     }
     .container {
       max-width: 1200px;
@@ -226,17 +232,39 @@
       color: var(--primary);
       transform: translateY(-3px);
     }
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
+      .nav-links {
+        gap: 15px;
+        font-size: 0.95rem;
+      }
+      
+      .nav-links a {
+        padding: 8px 12px;
+      }
+    }
+    @media (max-width: 600px) {
       .header {
         flex-direction: column;
-        padding: 15px;
+        gap: 20px;
+        padding: 20px 3%;
       }
+      
       .nav-links {
-        margin-top: 20px;
-        flex-wrap: wrap;
+        width: 100%;
         justify-content: center;
+        flex-wrap: wrap;
         gap: 10px;
       }
+      
+      .logo h1 {
+        font-size: 1.6rem;
+      }
+      
+      .logo i {
+        font-size: 1.6rem;
+      }
+    }
+    @media (max-width: 768px) {
       body {
         padding-top: 130px;
         padding-bottom: 100px;
@@ -270,7 +298,7 @@
     </div>
     <nav class="nav-links">
       <a href="index.html"><i class="fas fa-home"></i> Home</a>
-      <a href="chat.html"><i class="fas fa-comments"></i> Chat</a>
+      <a href="login.html"><i class="fas fa-comments"></i> Chat</a>
       <a href="earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
       <a href="advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
       <a href="admin-login.html"><i class="fas fa-lock"></i> Admin</a>
