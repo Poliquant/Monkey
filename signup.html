@@ -7,7 +7,7 @@
   <title>Sign Up | Prompt Monkeys</title>
   <meta name="description" content="Create a Prompt Monkeys account to join financial discussions, access market analysis, and explore earnings insights.">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -368,7 +368,10 @@
     const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
     try {
-      const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+      if (!window.supabase) {
+        throw new Error('Supabase library not loaded');
+      }
+      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
       console.log('Supabase client initialized:', !!supabase);
 
       document.getElementById('signupForm').addEventListener('submit', async (e) => {
@@ -436,31 +439,18 @@
             }
 
             console.log('Signup success:', data.user);
-            // Insert into users table
-            const { error: insertError } = await supabase
-              .from('users')
-              .insert({ id: data.user.id, username, email });
-
-            if (insertError) {
-              console.error('Insert error:', insertError);
-              emailError.textContent = insertError.message || 'Failed to save user data.';
-              emailError.style.display = 'block';
-              return;
-            }
-
-            console.log('User inserted successfully');
             alert('Sign-up successful! Please check your email for verification.');
             window.location.href = 'login.html';
           } catch (err) {
             console.error('Unexpected error during signup:', err);
-            emailError.textContent = 'An unexpected error occurred. Please try again.';
+            emailError.textContent = `Signup error: ${err.message || 'Please try again.'}`;
             emailError.style.display = 'block';
           }
         }
       });
     } catch (initError) {
-      console.error('Failed to initialize Supabase client:', initError);
-      alert('Failed to connect to the database. Please try again later.');
+      console.error('Failed to initialize Supabase client:', initError.message, initError.stack);
+      alert(`Failed to connect to the database: ${initError.message}. Please try again later.`);
     }
   </script>
 </body>
