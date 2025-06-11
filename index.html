@@ -38,48 +38,53 @@
       top: 0;
       width: 100%;
       z-index: 100;
-      padding: 15px 5%;
+      padding: 20px 5%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid var(--primary);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      border-bottom: 3px solid var(--primary);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
     .logo {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 15px;
     }
     .logo h1 {
       color: var(--primary);
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: 700;
+      letter-spacing: -0.5px;
     }
     .logo i {
-      font-size: 1.8rem;
+      font-size: 2rem;
       color: var(--primary);
       transform: rotate(-5deg);
+      transition: transform 0.3s;
+    }
+    .logo i:hover {
+      transform: rotate(5deg);
     }
     .nav-links {
       display: flex;
-      gap: 15px;
+      gap: 20px;
     }
     .nav-links a {
       color: var(--text-light);
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s;
-      padding: 8px 12px;
-      border-radius: 20px;
+      padding: 10px 15px;
+      border-radius: 25px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.95rem;
+      gap: 10px;
+      font-size: 1rem;
     }
-    .nav-links a:hover,
-    .nav-links a.active {
-      background-color: rgba(29, 185, 84, 0.15);
+    .nav-links a:hover, .nav-links a.active {
+      background-color: rgba(29, 185, 84, 0.2);
       color: var(--primary);
+      transform: scale(1.05);
     }
     .container {
       max-width: 1200px;
@@ -269,35 +274,36 @@
     .social-links a:hover {
       color: var(--primary);
     }
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
+      .nav-links {
+        gap: 15px;
+        font-size: 0.95rem;
+      }
+      
+      .nav-links a {
+        padding: 8px 12px;
+      }
+    }
+    @media (max-width: 600px) {
       .header {
         flex-direction: column;
-        padding: 15px;
-      }
-      .nav-links {
-        margin-top: 20px;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-      }
-      body {
-        padding-top: 130px;
-      }
-      .hero h1 {
-        font-size: 2rem;
-      }
-      .hero p {
-        font-size: 1rem;
-      }
-      .container {
+        gap: 20px;
         padding: 20px 3%;
       }
-      .section {
-        padding: 20px;
+      
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
       }
-      .btn {
-        padding: 10px 20px;
-        font-size: 1rem;
+      
+      .logo h1 {
+        font-size: 1.6rem;
+      }
+      
+      .logo i {
+        font-size: 1.6rem;
       }
     }
   </style>
@@ -404,18 +410,20 @@
     </section>
 
     <section class="section">
-      <h2><i class="fas fa-newspaper"></i> Latest Market Insights</h2>
+      российской Latest Market Insights</h2>
       <div class="features">
         <div class="feature-card">
           <h3>Tech Earnings Preview</h3>
-          <p>Breaking down what to expect from the big tech companies reporting this week, with sentiment analysis from our community.</p>
-          <a href="#" class="btn btn-secondary" style="margin-top: 15px;">Read Analysis</a>
+          <div class="p">
+            <p>Breaking down what to expect from the big tech companies reporting this week, with sentiment analysis from our community.</p>
+            <a href="#" class="btn btn-secondary", style="margin-top: 15px;">Read Analysis</a></p>
         </div>
         <div class="feature-card">
-          <h3>Fed Meeting Impact</h3>
-          <p>How the latest Federal Reserve decisions are affecting different sectors, with trade ideas from top members.</p>
-          <a href="#" class="btn btn-secondary" style="margin-top: 15px;">Read Analysis</a>
-        </div>
+          <div class="h3"><h3>Fed Meeting Impact</h3></div>
+          <div p="p">
+            <p><p>How the latest Federal Reserve decisions are affecting different sectors, with trade ideas from top members.</p>
+            <a href="#" class="btn btn-secondary" style="margin-top: 15px;">Read Analysis</a></p>
+          </div>
         <div class="feature-card">
           <h3>Emerging Markets Watch</h3>
           <p>Spotlight on undervalued opportunities in emerging markets based on fundamental and technical factors.</p>
@@ -450,7 +458,7 @@
       <a href="#"><i class="fab fa-linkedin"></i></a>
       <a href="#"><i class="fab fa-youtube"></i></a>
     </div>
-    <p class="copyright">© 2025 Prompt Monkeys. All rights reserved.</p>
+    <p class="copyright">© 2023 Prompt Monkeys>. All rights reserved.</p>
   </footer>
 </body>
 </html>
