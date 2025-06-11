@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify Email | Prompt Monkeys</title>
+  <meta name="description" content="Verify your email to activate your Prompt Monkeys account and access financial discussions.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    :root {
+      --primary: #1DB954;
+      --primary-light: #4cd97f;
+      --primary-dark: #1AA34A;
+      --secondary: #191414;
+      --background: #121212;
+      --card-bg: #1f1f1f;
+      --text: #FFFFFF;
+      --text-light: #B3B3B3;
+      --border: #333;
+      --error: #FF4D4D;
+    }
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 90px;
+      padding-bottom: 70px;
+      background-image: radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.08) 0%, transparent 40%);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background-color: var(--secondary);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 20px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--primary);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .logo h1 {
+      color: var(--primary);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .logo i {
+      font-size: 2rem;
+      color: var(--primary);
+      transform: rotate(-5deg);
+      transition: transform 0.3s;
+    }
+    .logo i:hover {
+      transform: rotate(5deg);
+    }
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+    .nav-links a {
+      color: var(--text-light);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      padding: 10px 15px;
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+    }
+    .nav-links a:hover,
+    .nav-links a.active {
+      background-color: rgba(29,185,84,0.2);
+      color: var(--primary);
+      transform: scale(1.05);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 5%;
+      flex: 1;
+    }
+    .verify-container {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .verify-header {
+      margin-bottom: 20px;
+    }
+    .verify-header h2 {
+      color: var(--primary);
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    .verify-header p {
+      color: var(--text-light);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary);
+      color: white;
+      padding: 12px 25px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+      font-size: 1.1rem;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(29,185,84,0.3);
+    }
+    .error-message {
+      color: var(--error);
+      font-size: 0.9rem;
+      margin-top: 10px;
+      display: none;
+    }
+    .footer {
+      background-color: var(--secondary);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 15px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 2px solid var(--primary);
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
+    }
+    .footer .logo {
+      justify-content: center;
+    }
+    .footer-links {
+      display: flex;
+      gap: 15px;
+    }
+    .footer-links a {
+      color: var(--text-light);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      padding: 8px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+    .footer-links a:hover {
+      background-color: rgba(29,185,84,0.15);
+      color: var(--primary);
+    }
+    .social-links {
+      display: flex;
+      gap: 15px;
+    }
+    .social-links a {
+      color: var(--text-light);
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+    .social-links a:hover {
+      color: var(--primary);
+      transform: translateY(-3px);
+    }
+    @media (max-width: 900px) {
+      .nav-links {
+        gap: 15px;
+        font-size: .95rem;
+      }
+      .nav-links a {
+        padding: 8px 12px;
+      }
+    }
+    @media (max-width: 600px) {
+      .header {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px 3%;
+      }
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .logo h1 {
+        font-size: 1.6rem;
+      }
+      .logo i {
+        font-size: 1.6rem;
+      }
+    }
+    @media (max-width: 768px) {
+      body {
+        padding-top: 130px;
+        padding-bottom: 100px;
+      }
+      .verify-container {
+        padding: 30px 20px;
+      }
+      .footer {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+      }
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+    }
+    @media (max-width: 480px) {
+      .verify-container {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <i class="fas fa-monkey"></i>
+      <h1>Prompt Monkeys</h1>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <a href="login.html"><i class="fas fa-comments"></i> Chat</a>
+      <a href="earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
+      <a href="advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
+      <a href="admin-login.html"><i class="fas fa-lock"></i> Admin</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="verify-container">
+      <div class="verify-header">
+        <h2><i class="fas fa-check-circle"></i> Verify Your Email</h2>
+        <p>Confirming your email address to activate your account.</p>
+      </div>
+      <div id="verify-message"></div>
+      <div class="error-message" id="verify-error"></div>
+      <a href="login.html" class="btn"><i class="fas fa-sign-in-alt"></i> Go to Login</a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="logo">
+      <i class="fas fa-monkey"></i>
+      <h1>Prompt Monkeys</h1>
+    </div>
+    <div class="footer-links">
+      <a href="about.html">About Us</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms</a>
+      <a href="contact.html">Contact</a>
+      <a href="faq.html">FAQ</a>
+    </div>
+    <div class="social-links">
+      <a href="https://x.com"><i class="fab fa-twitter"></i></a>
+      <a href="https://discord.com"><i class="fab fa-discord"></i></a>
+      <a href="https://linkedin.com"><i class="fab fa-linkedin"></i></a>
+      <a href="https://youtube.com"><i class="fab fa-youtube"></i></a>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Supabase client
+    const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+    try {
+      if (!window.supabase) {
+        throw new Error('Supabase library not loaded');
+      }
+      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+      console.log('Supabase client initialized:', !!supabase);
+
+      // Handle email verification
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const type = urlParams.get('type');
+      const verifyMessage = document.getElementById('verify-message');
+      const verifyError = document.getElementById('verify-error');
+
+      if (token && type === 'signup') {
+        (async () => {
+          try {
+            verifyMessage.textContent = 'Verifying your email...';
+            const { error } = await supabase.auth.verifyOtp({
+              token,
+              type: 'signup'
+            });
+            if (error) {
+              console.error('Verification error:', error);
+              verifyError.textContent = 'Verification failed: ' + error.message;
+              verifyError.style.display = 'block';
+            } else {
+              console.log('Email verified successfully');
+              verifyMessage.textContent = 'Email verified! Your account is now active.';
+              // Clear URL parameters
+              window.history.replaceState({}, document.title, '/Monkey/verify.html');
+            }
+          } catch (err) {
+            console.error('Unexpected verification error:', err);
+            verifyError.textContent = 'An error occurred during verification. Please try again.';
+            verifyError.style.display = 'block';
+          }
+        })();
+      } else {
+        verifyMessage.textContent = 'Invalid or missing verification link. Please check your email.';
+      }
+    } catch (err) {
+      console.error('Failed to initialize Supabase client:', err);
+      document.getElementById('verify-error').textContent = 'Failed to connect to database. Please try again later.';
+      document.getElementById('verify-error').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
+```
+
+**Features**:
+- Verifies email using `supabase.auth.verifyOtp`.
+- Displays status messages (e.g., “Verifying…”, “Email verified!”).
+- Redirects to `login.html` via a button.
+- Matches `signup.html` styling (dark theme, green buttons).
+
+### Step 2: Update `login.html`
+This version removes verification logic, focuses on login, and redirects to `chat.html`. It retains your original design.
+
+<xaiArtifact artifact_id="7fae812c-0607-48b5-b450-ca7a34dfb001" artifact_version_id="4f94aeb1-40b1-4f4d-b2be-0235cd1079b7" title="login.html" contentType="text/html">
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | Prompt Monkeys - Financial Community Hub</title>
+  <meta name="description" content="Login to your Prompt Monkeys account to access financial discussions, market analysis, and earnings insights.">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    :root {
+      --primary: #1DB954;
+      --primary-light: #4cd97f;
+      --primary-dark: #1AA34A;
+      --secondary: #191414;
+      --background: #121212;
+      --card-bg: #1f1f1f;
+      --text: #FFFFFF;
+      --text-light: #B3B3B3;
+      --border: #333;
+      --error: #FF4D4D;
+    }
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      padding-top: 90px;
+      padding-bottom: 70px;
+      background-image: radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.08) 0%, transparent 40%);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      background-color: var(--secondary);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 20px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid var(--primary);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .logo h1 {
+      color: var(--primary);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .logo i {
+      font-size: 2rem;
+      color: var(--primary);
+      transform: rotate(-5deg);
+      transition: transform 0.3s;
+    }
+    .logo i:hover {
+      transform: rotate(5deg);
+    }
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+    .nav-links a {
+      color: var(--text-light);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      padding: 10px 15px;
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1rem;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      background-color: rgba(29, 185, 84, 0.2);
+      color: var(--primary);
+      transform: scale(1.05);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 5%;
+      flex: 1;
+    }
+    .login-container {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border);
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .login-header h2 {
+      color: var(--primary);
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    .login-header p {
+      color: var(--text-light);
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      background-color: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary);
+      color: white;
+      padding: 12px 25px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+      font-size: 1.1rem;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(29, 185, 84, 0.3);
+    }
+    .login-footer {
+      text-align: center;
+      margin-top: 25px;
+      color: var(--text-light);
+    }
+    .login-footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .login-footer a:hover {
+      text-decoration: underline;
+    }
+    .error-message {
+      color: var(--error);
+      font-size: 0.9rem;
+      margin-top: 5px;
+      display: none;
+    }
+    .remember-forgot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .remember-me input {
+      accent-color: var(--primary);
+    }
+    .forgot-password a {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+    .footer {
+      background-color: var(--secondary);
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      z-index: 100;
+      padding: 15px 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 2px solid var(--primary);
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+    }
+    .footer .logo {
+      justify-content: center;
+    }
+    .footer-links {
+      display: flex;
+      gap: 15px;
+    }
+    .footer-links a {
+      color: var(--text-light);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      padding: 8px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+    .footer-links a:hover {
+      background-color: rgba(29, 185, 84, 0.15);
+      color: var(--primary);
+    }
+    .social-links {
+      display: flex;
+      gap: 15px;
+    }
+    .social-links a {
+      color: var(--text-light);
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+    .social-links a:hover {
+      color: var(--primary);
+      transform: translateY(-3px);
+    }
+    @media (max-width: 900px) {
+      .nav-links {
+        gap: 15px;
+        font-size: 0.95rem;
+      }
+      .nav-links a {
+        padding: 8px 12px;
+      }
+    }
+    @media (max-width: 600px) {
+      .header {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px 3%;
+      }
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .logo h1 {
+        font-size: 1.6rem;
+      }
+      .logo i {
+        font-size: 1.6rem;
+      }
+    }
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        padding: 15px;
+      }
+      .nav-links {
+        margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+      body {
+        padding-top: 130px;
+        padding-bottom: 100px;
+      }
+      .login-container {
+        padding: 30px 20px;
+      }
+      .footer {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+      }
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+    }
+    @media (max-width: 480px) {
+      .remember-forgot {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <i class="fas fa-monkey"></i>
+      <h1>Prompt Monkeys</h1>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html"><i class="fas fa-home"></i> Home</a>
+      <a href="login.html"><i class="fas fa-comments"></i> Chat</a>
+      <a href="earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
+      <a href="advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
+      <a href="admin-login.html"><i class="fas fa-lock"></i> Admin</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="login-container">
+      <div class="login-header">
+        <h2><i class="fas fa-sign-in-alt"></i> Member Login</h2>
+        <p>Access your account to join financial discussions and market analysis</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+          <div class="error-message" id="email-error">Please enter a valid email address</div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+          <div class="error-message" id="password-error"></div>
+        </div>
+
+        <div class="remember-forgot">
+          <div class="remember-me">
+            <input type="checkbox" id="remember">
+            <label for="remember">Remember me</label>
+          </div>
+          <div class="forgot-password">
+            <a href="forgot-password.html">Forgot password?</a>
+          </div>
+        </div>
+
+        <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Login</button>
+      </form>
+
+      <div class="login-footer">
+        <p>Don't have an account? <a href="signup.html">Sign up now</a></p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="logo">
+      <i class="fas fa-monkey"></i>
+      <h1>Prompt Monkeys</h1>
+    </div>
+    <div class="footer-links">
+      <a href="about.html">About Us</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="contact.html">Contact</a>
+      <a href="faq.html">FAQ</a>
+    </div>
+    <div class="social-links">
+      <a href="https://x.com"><i class="fab fa-twitter"></i></a>
+      <a href="https://discord.com"><i class="fab fa-discord"></i></a>
+      <a href="https://linkedin.com"><i class="fab fa-linkedin"></i></a>
+      <a href="https://youtube.com"><i class="fab fa-youtube"></i></a>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Supabase client
+    const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+    try {
+      if (!window.supabase) {
+        throw new Error('Supabase library not loaded');
+      }
+      const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+      console.log('Supabase client initialized:', !!supabase);
+
+      // Handle login
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+
+        // Reset errors
+        emailError.style.display = 'none';
+        passwordError.style.display = 'none';
+
+        let isValid = true;
+
+        // Email validation
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          emailError.style.display = 'block';
+          isValid = false;
+        }
+
+        // Password validation
+        if (!password || password.length < 8) {
+          passwordError.textContent = 'Password must be at least 8 characters';
+          passwordError.style.display = 'block';
+          isValid = false;
+        }
+
+        if (isValid) {
+          try {
+            console.log('Attempting login with:', { email });
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email,
+              password
+            });
+
+            if (error) {
+              console.error('Login error:', error);
+              passwordError.textContent = error.message || 'Invalid email or password';
+              passwordError.style.display = 'block';
+            } else {
+              // Store session if "Remember me" is checked
+              const remember = document.getElementById('remember').checked;
+              if (remember) {
+                localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+              }
+              console.log('Login successful:', data.user);
+              alert('Login successful! Redirecting to chat...');
+              window.location.href = 'chat.html';
+            }
+          } catch (err) {
+            console.error('Unexpected error during login:', err);
+            passwordError.textContent = 'An error occurred. Please try again.';
+            passwordError.style.display = 'block';
+          }
+        }
+      });
+    } catch (err) {
+      console.error('Failed to initialize Supabase client:', err);
+      document.getElementById('password-error').textContent = 'Failed to connect to database. Please try again later.';
+      document.getElementById('password-error').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
+```
+
+**Features**:
+- Handles login with `supabase.auth.signInWithPassword`.
+- Redirects to `chat.html` on success.
+- Retains “Remember me” and “Forgot password” features.
+- Matches original styling.
+
+### Step 3: Update Supabase Email Template
+The verification email must point to `verify.html`. Update the template to use `{{ .ConfirmationURL }}` and avoid spam flags.
+
+<xaiArtifact artifact_id="6c6ea8f4-c732-432f-a54b-f1c25e9c2489" artifact_version_id="cbb92c9e-5127-4046-a592-4a39263170ff" title="supabase_email_template.html" contentType="text/html">
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Confirm Your Email - Prompt Monkeys</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f6; color: #333333; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header h2 { color: #1DB954; font-size: 24px; }
+    .content p { font-size: 16px; line-height: 1.5; margin-bottom: 16px; }
+    .button { display: inline-block; padding: 12px 24px; background-color: #1DB954; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; }
+    .button:hover { background-color: #1AA34A; }
+    .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #555555; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Welcome to Prompt Monkeys</h2>
+    </div>
+    <div class="content">
+      <p>Thank you for signing up! Please confirm your email address to activate your account.</p>
+      <p>
+        <a href="{{ .ConfirmationURL }}" class="button">Verify Your Email</a>
+      </p>
+      <p>If the button doesn’t work, copy and paste this link into your browser:</p>
+      <p>{{ .ConfirmationURL }}</p>
+      <p>This link expires in 24 hours.</p>
+    </div>
+    <div class="footer">
+      <p>If you didn’t sign up for Prompt Monkeys, please ignore this email.</p>
+      <p>© 2025 Prompt Monkeys</p>
+    </div>
+  </div>
+</body>
+</html>
