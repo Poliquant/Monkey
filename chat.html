@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prompt Monkeys - Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         :root {
             --primary: #1DB954;
             --primary-light: #4cd97f;
             --primary-dark: #1AA34A;
             --secondary: #191414;
+            --accent: #1ED760;
             --background: #121212;
             --card-bg: #1f1f1f;
             --text: #FFFFFF;
@@ -28,13 +29,15 @@
             --admin-color: #1DB954;
             --rule-icon: #1DB954;
         }
+
         body {
             background-color: var(--background);
             color: var(--text);
             padding-top: 90px;
-            background-image: radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.1) 0%;
+            background-image: radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.1) 0%, transparent 50%);
             line-height: 1.7;
         }
+
         .header {
             background-color: var(--secondary);
             position: fixed;
@@ -48,30 +51,36 @@
             border-bottom: 3px solid var(--primary);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
         }
+
         .logo {
             display: flex;
             align-items: center;
             gap: 15px;
         }
+
         .logo h1 {
             color: var(--primary);
             font-size: 2rem;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
+
         .logo i {
             font-size: 2rem;
             color: var(--primary);
             transform: rotate(-5deg);
             transition: transform 0.3s;
         }
+
         .logo i:hover {
             transform: rotate(5deg);
         }
+
         .nav-links {
             display: flex;
             gap: 20px;
         }
+
         .nav-links a {
             color: var(--text-light);
             text-decoration: none;
@@ -84,11 +93,13 @@
             gap: 10px;
             font-size: 1rem;
         }
+
         .nav-links a:hover, .nav-links a.active {
             background-color: rgba(29, 185, 84, 0.2);
             color: var(--primary);
             transform: scale(1.05);
         }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -104,38 +115,45 @@
             border: none;
             cursor: pointer;
         }
+
         .btn:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
         }
+
         .btn-secondary {
-            background: none;
+            background: rgba(255, 255, 255, 0.1);
             border: 2px solid var(--primary);
             color: var(--primary);
         }
+
         .btn-secondary:hover {
             background: rgba(29, 185, 84, 0.2);
             color: var(--primary-light);
             border-color: var(--primary-light);
         }
+
         .btn i {
             font-size: 0.9em;
         }
+
         .container {
             max-width: 1300px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 40px 5%;
             display: flex;
             gap: 35px;
         }
+
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             gap: 30px;
         }
-        .welcome {
+
+        .welcome-banner {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 16px;
             padding: 40px;
@@ -144,7 +162,8 @@
             position: relative;
             overflow: hidden;
         }
-        .welcome::before {
+
+        .welcome-banner::before {
             content: '';
             position: absolute;
             top: 0;
@@ -154,18 +173,21 @@
             background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             opacity: 0.5;
         }
-        .welcome h2 {
+
+        .welcome-banner h2 {
             font-size: 2.5rem;
             margin-bottom: 20px;
             position: relative;
         }
-        .welcome p {
+
+        .welcome-banner p {
             font-size: 1.2rem;
             max-width: 800px;
             margin: 0 auto 30px;
             line-height: 1.7;
             position: relative;
         }
+
         .sidebar {
             width: 350px;
             background-color: var(--card-bg);
@@ -175,6 +197,7 @@
             border: 1px solid var(--border);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
         }
+
         .sidebar h3 {
             margin-bottom: 25px;
             color: var(--primary);
@@ -183,6 +206,7 @@
             align-items: center;
             gap: 15px;
         }
+
         .sidebar h3 i {
             background: rgba(29, 185, 84, 0.25);
             width: 45px;
@@ -192,9 +216,11 @@
             align-items: center;
             justify-content: center;
         }
+
         .community-rules {
             list-style: none;
         }
+
         .rule-item {
             display: flex;
             align-items: flex-start;
@@ -203,6 +229,7 @@
             padding-bottom: 25px;
             border-bottom: 1px solid var(--border);
         }
+
         .rule-icon {
             background: rgba(29, 185, 84, 0.2);
             color: var(--primary);
@@ -216,19 +243,23 @@
             font-size: 1.2rem;
             transition: transform 0.3s;
         }
+
         .rule-item:hover .rule-icon {
             transform: scale(1.1);
         }
+
         .rule-content h4 {
             margin-bottom: 8px;
             color: var(--primary-light);
             font-size: 1.1rem;
         }
+
         .rule-content p {
             color: var(--text-light);
             line-height: 1.6;
             font-size: 0.95rem;
         }
+
         .advertise-btn {
             background: var(--primary);
             color: white;
@@ -246,11 +277,13 @@
             gap: 12px;
             font-size: 1.1rem;
         }
+
         .advertise-btn:hover {
             background: var(--primary-dark);
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(29, 185, 84, 0.4);
         }
+
         .post {
             background-color: var(--card-bg);
             border-radius: 16px;
@@ -260,10 +293,12 @@
             transition: all 0.3s;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
+
         .post:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
         }
+
         .post-header {
             display: flex;
             align-items: center;
@@ -271,6 +306,7 @@
             border-bottom: 1px solid var(--border);
             background: rgba(29, 185, 84, 0.08);
         }
+
         .post-avatar {
             width: 55px;
             height: 55px;
@@ -284,15 +320,18 @@
             font-weight: bold;
             font-size: 1.3rem;
         }
+
         .post-info {
             flex: 1;
         }
+
         .post-title {
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 10px;
             color: var(--text);
         }
+
         .post-meta {
             display: flex;
             align-items: center;
@@ -300,14 +339,17 @@
             color: var(--text-light);
             font-size: 1rem;
         }
+
         .post-content {
             padding: 30px;
             line-height: 1.8;
             font-size: 1.15rem;
         }
+
         .post-content p {
             margin-bottom: 20px;
         }
+
         .post-actions {
             padding: 20px 30px;
             display: flex;
@@ -315,6 +357,7 @@
             border-top: 1px solid var(--border);
             background: rgba(29, 185, 84, 0.08);
         }
+
         .stat-item {
             display: flex;
             align-items: center;
@@ -326,18 +369,23 @@
             padding: 10px 20px;
             border-radius: 25px;
         }
+
         .stat-item:hover {
             background: rgba(255, 255, 255, 0.1);
         }
+
         .upvote:hover {
             color: var(--upvote);
         }
+
         .downvote:hover {
             color: var(--downvote);
         }
+
         .comments-section {
             padding: 20px 30px 30px;
         }
+
         .comment-form {
             margin-bottom: 30px;
             padding: 25px;
@@ -345,6 +393,7 @@
             border-radius: 16px;
             border: 1px solid var(--border);
         }
+
         .comment-form h4 {
             margin-bottom: 20px;
             color: var(--text-light);
@@ -353,6 +402,26 @@
             gap: 12px;
             font-size: 1.2rem;
         }
+
+        .comment-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid var --
+
+border);
+            background: rgba(18, 18, 18, 0.8);
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .comment-form input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
         .comment-form textarea {
             width: 100%;
             padding: 15px;
@@ -366,10 +435,12 @@
             font-size: 1rem;
             transition: border-color 0.3s;
         }
+
         .comment-form textarea:focus {
             border-color: var(--primary);
             outline: none;
         }
+
         .comment-form button {
             background: var(--primary);
             color: white;
@@ -381,11 +452,13 @@
             font-size: 1.1rem;
             transition: all 0.3s;
         }
+
         .comment-form button:hover {
             background: var(--primary-dark);
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(29, 185, 84, 0.4);
         }
+
         .comment {
             background: rgba(29, 185, 84, 0.08);
             border-radius: 12px;
@@ -394,14 +467,17 @@
             border: 1px solid var(--border);
             transition: all 0.3s;
         }
+
         .comment:hover {
             background: rgba(29, 185, 84, 0.12);
         }
+
         .comment-header {
             display: flex;
             align-items: center;
             margin-bottom: 20px;
         }
+
         .comment-avatar {
             width: 45px;
             height: 45px;
@@ -415,27 +491,32 @@
             font-weight: bold;
             font-size: 1.1rem;
         }
+
         .comment-user {
             font-weight: 600;
             font-size: 1.1rem;
             color: var(--text);
         }
+
         .comment-time {
             font-size: 0.9rem;
             color: var(--text-light);
             margin-left: 20px;
         }
+
         .comment-content {
             line-height: 1.7;
             font-size: 1.1rem;
             padding-left: 60px;
         }
+
         .comment-actions {
             margin-top: 20px;
             display: flex;
             gap: 25px;
             padding-left: 60px;
         }
+
         .admin-badge {
             background: var(--admin-color);
             color: white;
@@ -445,6 +526,7 @@
             margin-left: 12px;
             font-weight: bold;
         }
+
         .notification {
             position: fixed;
             top: 100px;
@@ -458,86 +540,107 @@
             transform: translateX(150%);
             transition: transform 0.3s ease;
         }
+
         .notification.show {
             transform: translateX(0);
         }
+
         .community-stats {
             margin-top: 30px;
             padding: 20px;
             background: rgba(29, 185, 84, 0.08);
             border-radius: 12px;
         }
+
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
+
         .stat-box {
             text-align: center;
             padding: 10px;
         }
+
         .stat-number {
             font-size: 2.2rem;
             font-weight: bold;
             color: var(--primary);
         }
+
         .stat-label {
             color: var(--text-light);
             font-size: 0.95rem;
         }
+
         @media (max-width: 900px) {
             .container {
                 flex-direction: column;
                 padding: 30px 3%;
             }
+
             .sidebar {
                 width: 100%;
             }
+
             .nav-links {
                 gap: 15px;
                 font-size: 0.95rem;
             }
+
             .nav-links a {
                 padding: 8px 12px;
             }
         }
+
         @media (max-width: 600px) {
             body {
                 padding-top: 130px;
             }
+
             .header {
                 flex-direction: column;
                 gap: 20px;
                 padding: 20px 3%;
             }
+
             .nav-links {
                 width: 100%;
                 justify-content: center;
                 flex-wrap: wrap;
                 gap: 10px;
             }
+
             .logo h1 {
                 font-size: 1.6rem;
             }
+
             .logo i {
                 font-size: 1.6rem;
             }
-            .welcome {
+
+            .welcome-banner {
                 padding: 25px;
             }
-            .welcome h2 {
+
+            .welcome-banner h2 {
                 font-size: 2rem;
             }
-            .welcome p {
+
+            .welcome-banner p {
                 font-size: 1.1rem;
             }
+
             .post-actions {
                 flex-direction: column;
                 gap: 15px;
             }
+
             .comment-content {
                 padding-left: 0;
             }
+
             .comment-actions {
                 padding-left: 0;
             }
@@ -546,7 +649,7 @@
 </head>
 <body>
     <div class="notification" id="notification"></div>
-    
+
     <header class="header">
         <div class="logo">
             <i class="fas fa-monkey"></i>
@@ -563,7 +666,7 @@
 
     <div class="container">
         <div class="main-content">
-            <div class="welcome">
+            <div class="welcome-banner">
                 <h2>Welcome to Prompt Monkeys Chat</h2>
                 <p>Your trusted source for expert financial insights and market analysis. Join the conversation and stay ahead of market trends.</p>
             </div>
@@ -614,7 +717,7 @@
             <button class="advertise-btn" onclick="window.location.href='advertise.html'">
                 <i class="fas fa-bullhorn"></i> Advertise With Us
             </button>
-            
+
             <div class="community-stats">
                 <h3><i class="fas fa-chart-bar"></i> Community Stats</h3>
                 <div class="stats-grid">
@@ -632,12 +735,7 @@
     </div>
 
     <script>
-        // Initialize Supabase
-        const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        // Time formatting
+        // Time formatting function
         function timeSince(date) {
             const seconds = Math.floor((new Date() - new Date(date)) / 1000);
             let interval = seconds / 31536000;
@@ -653,81 +751,65 @@
             return Math.floor(seconds) + " seconds ago";
         }
 
+        // Sample data for demonstration
+        const samplePosts = [
+            {
+                id: 1,
+                title: "Bitcoin Analysis: Bullish Signals Emerging",
+                author: "admin",
+                content: "Recent on-chain data shows accumulation by large holders. The Puell Multiple suggests we're in the early stages of a new bull market. Key resistance at $65K needs to be broken for confirmation.\n\nThe current market sentiment is positive, with increasing institutional interest and growing adoption in emerging markets. However, regulatory developments remain a key factor to watch in the coming months.",
+                upvotes: 42,
+                downvotes: 3,
+                created_at: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
+                is_admin: true,
+                comments: [
+                    {
+                        id: 1,
+                        author: "crypto_trader",
+                        content: "Interesting analysis. What's your price target for EOY? I'm particularly interested in how the halving event might impact the price trajectory.",
+                        upvotes: 5,
+                        downvotes: 0,
+                        created_at: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
+                    },
+                    {
+                        id: 2,
+                        author: "market_watcher",
+                        content: "Don't forget about miner capitulation risk if price drops below $58K. The hash rate has been fluctuating recently, which could indicate some stress in the mining sector.",
+                        upvotes: 3,
+                        downvotes: 1,
+                        created_at: new Date(Date.now() - 2700000).toISOString() // 45 minutes ago
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Upcoming Tech Earnings Preview",
+                author: "admin",
+                content: "Big tech earnings next week. Focus on cloud growth rates and AI monetization. My predictions:\n\n- MSFT: Likely to beat expectations due to Azure growth\n- META: In-line with projections, focus on Reels monetization\n- GOOGL: Slight miss on ad revenue but strong cloud performance\n- AMZN: AWS growth accelerating, retail margins improving\n\nThe key metrics to watch will be guidance for Q3 and any commentary on AI investments and returns.",
+                upvotes: 28,
+                downvotes: 7,
+                created_at: new Date(Date.now() - 18000000).toISOString(), // 5 hours ago
+                is_admin: true,
+                comments: [
+                    {
+                        id: 3,
+                        author: "investor123",
+                        content: " Agree on MSFT. Their AI products are seeing strong enterprise adoption. I've heard from several CIOs that they're increasing their Azure budgets specifically for AI workloads.",
+                        upvotes: 8,
+                        downvotes: 2,
+                        created_at: new Date(Date.now() - 10800000).toISOString() // 3 hours ago
+                    }
+                ]
+            }
+        ];
+
         // UI Controller
         const uiController = {
-            async checkAuth() {
-                const { data: { user }, error } = await supabase.auth.getUser();
-                if (error || !user || !user.email_confirmed_at) {
-                    window.location.href = 'login.html';
-                    return null;
-                }
-                return user;
-            },
-
-            async fetchPosts() {
-                const { data, error } = await supabase
-                    .from('posts')
-                    .select(`
-                        id, title, content, created_at,
-                        users (username, is_admin),
-                        post_votes (vote_type, user_id)
-                    `)
-                    .order('created_at', { ascending: false });
-
-                if (error) {
-                    console.error('Error fetching posts:', error);
-                    return [];
-                }
-
-                return data.map(post => ({
-                    id: post.id,
-                    title: post.title,
-                    content: post.content,
-                    author: post.users.username,
-                    is_admin: post.users.is_admin,
-                    created_at: post.created_at,
-                    upvotes: post.post_votes.filter(v => v.vote_type).length,
-                    downvotes: post.post_votes.filter(v => !v.vote_type).length,
-                    user_vote: post.post_votes.find(v => v.user_id === supabase.auth.getUser().id)?.vote_type
-                }));
-            },
-
-            async fetchComments(postId) {
-                const { data, error } = await supabase
-                    .from('comments')
-                    .select(`
-                        id, content, created_at,
-                        users (username),
-                        comment_votes (vote_type, user_id)
-                    `)
-                    .eq('post_id', postId)
-                    .order('created_at', { ascending: false });
-
-                if (error) {
-                    console.error('Error fetching comments:', error);
-                    return [];
-                }
-
-                return data.map(comment => ({
-                    id: comment.id,
-                    author: comment.users.username,
-                    content: comment.content,
-                    created_at: comment.created_at,
-                    upvotes: comment.comment_votes.filter(v => v.vote_type).length,
-                    downvotes: comment.comment_votes.filter(v => !v.vote_type).length,
-                    user_vote: comment.comment_votes.find(v => v.user_id === supabase.auth.getUser().id)?.vote_type
-                }));
-            },
-
-            async renderPosts() {
-                const user = await this.checkAuth();
-                if (!user) return;
-
+            renderPosts() {
                 const postsContainer = document.getElementById('postsContainer');
                 postsContainer.innerHTML = '';
-                const posts = await this.fetchPosts();
 
-                if (posts.length === 0) {
+                if (samplePosts.length === 0) {
                     postsContainer.innerHTML = `
                         <div class="post">
                             <div class="post-content" style="text-align: center; padding: 60px 25px;">
@@ -742,8 +824,7 @@
                     return;
                 }
 
-                for (const post of posts) {
-                    const comments = await this.fetchComments(post.id);
+                samplePosts.forEach(post => {
                     const postElement = document.createElement('div');
                     postElement.className = 'post';
                     postElement.innerHTML = `
@@ -773,12 +854,13 @@
                             </div>
                             <div class="stat-item">
                                 <i class="fas fa-comment"></i>
-                                <span>${comments.length} comments</span>
+                                <span>${post.comments.length} comments</span>
                             </div>
                         </div>
                         <div class="comments-section">
                             <div class="comment-form" data-post="${post.id}">
                                 <h4><i class="fas fa-comment-dots"></i> Add a Comment</h4>
+                                <input type="text" class="comment-author" placeholder="Your name (optional)">
                                 <textarea placeholder="Share your thoughts..."></textarea>
                                 <button class="btn"><i class="fas fa-paper-plane"></i> Post Comment</button>
                             </div>
@@ -786,10 +868,10 @@
                         </div>
                     `;
                     postsContainer.appendChild(postElement);
-                    this.renderComments(post.id, comments);
-                }
+                    this.renderComments(post.id, post.comments);
+                });
 
-                this.updateStats(posts, comments);
+                this.updateStats();
                 this.attachEventListeners();
             },
 
@@ -798,6 +880,7 @@
                 if (!commentsList) return;
 
                 commentsList.innerHTML = '';
+
                 if (comments.length === 0) {
                     commentsList.innerHTML = `
                         <div class="comment">
@@ -836,113 +919,141 @@
                 });
             },
 
-            updateStats(posts, comments) {
-                document.getElementById('totalPosts').textContent = posts.length;
-                document.getElementById('totalComments').textContent = comments.reduce((sum, c) => sum + c.length, 0);
+            updateStats() {
+                const totalComments = samplePosts.reduce((sum, post) => sum + post.comments.length, 0);
+                document.getElementById('totalPosts').textContent = samplePosts.length;
+                document.getElementById('totalComments').textContent = totalComments;
             },
 
-            showNotification(message, isError = false) {
+            showNotification(message) {
                 const notification = document.getElementById('notification');
                 notification.textContent = message;
-                notification.style.background = isError ? 'var(--downvote)' : 'var(--primary)';
                 notification.classList.add('show');
                 setTimeout(() => notification.classList.remove('show'), 3000);
             },
 
             attachEventListeners() {
-                // Post votes
                 document.querySelectorAll('.upvote[data-post]').forEach(button => {
-                    button.addEventListener('click', async () => {
-                        const postId = button.getAttribute('data-post');
-                        const { error } = await supabase
-                            .from('post_votes')
-                            .insert({ post_id: postId, user_id: (await supabase.auth.getUser()).data.user.id, vote_type: true });
-                        if (error && error.code !== '23505') {
-                            this.showNotification('Error upvoting post', true);
-                            console.error('Upvote error:', error);
-                        } else {
-                            await this.renderPosts();
+                    button.addEventListener('click', async (e) => {
+                        if (button.classList.contains('voted')) return;
+
+                        const postId = parseInt(button.getAttribute('data-post'));
+                        const post = samplePosts.find(p => p.id === postId);
+                        if (post) {
+                            post.upvotes++;
+                            const countElement = button.querySelector('.vote-count');
+                            countElement.textContent = post.upvotes;
+
+                            button.classList.add('voted');
+                            button.style.color = 'var(--upvote)';
+                            setTimeout(() => {
+                                button.style.color = '';
+                            }, 300);
                         }
                     });
                 });
 
                 document.querySelectorAll('.downvote[data-post]').forEach(button => {
-                    button.addEventListener('click', async () => {
-                        const postId = button.getAttribute('data-post');
-                        const { error } = await supabase
-                            .from('post_votes')
-                            .insert({ post_id: postId, user_id: (await supabase.auth.getUser()).data.user.id, vote_type: false });
-                        if (error && error.code !== '23505') {
-                            this.showNotification('Error downvoting post', true);
-                            console.error('Downvote error:', error);
-                        } else {
-                            await this.renderPosts();
+                    button.addEventListener('click', async (e) => {
+                        if (button.classList.contains('voted')) return;
+
+                        const postId = parseInt(button.getAttribute('data-post'));
+                        const post = samplePosts.find(p => p.id === postId);
+                        if (post) {
+                            post.downvotes++;
+                            const countElement = button.querySelector('.vote-count');
+                            countElement.textContent = post.downvotes;
+
+                            button.classList.add('voted');
+                            button.style.color = 'var(--downvote)';
+                            setTimeout(() => {
+                                button.style.color = '';
+                            }, 300);
                         }
                     });
                 });
 
-                // Comment votes
                 document.querySelectorAll('.upvote[data-comment]').forEach(button => {
-                    button.addEventListener('click', async () => {
-                        const commentId = button.getAttribute('data-comment');
-                        const { error } = await supabase
-                            .from('comment_votes')
-                            .insert({ comment_id: commentId, user_id: (await supabase.auth.getUser()).data.user.id, vote_type: true });
-                        if (error && error.code !== '23505') {
-                            this.showNotification('Error upvoting comment', true);
-                            console.error('Upvote error:', error);
-                        } else {
-                            await this.renderPosts();
+                    button.addEventListener('click', async (e) => {
+                        if (button.classList.contains('voted')) return;
+
+                        const commentId = parseInt(button.getAttribute('data-comment'));
+                        for (const post of samplePosts) {
+                            const comment = post.comments.find(c => c.id === commentId);
+                            if (comment) {
+                                comment.upvotes++;
+                                const countElement = button.querySelector('.vote-count');
+                                countElement.textContent = comment.upvotes;
+
+                                button.classList.add('voted');
+                                button.style.color = 'var(--upvote)';
+                                setTimeout(() => {
+                                    button.style.color = '';
+                                }, 300);
+                                break;
+                            }
                         }
                     });
                 });
 
                 document.querySelectorAll('.downvote[data-comment]').forEach(button => {
-                    button.addEventListener('click', async () => {
-                        const commentId = button.getAttribute('data-comment');
-                        const { error } = await supabase
-                            .from('comment_votes')
-                            .insert({ comment_id: commentId, user_id: (await supabase.auth.getUser()).data.user.id, vote_type: false });
-                        if (error && error.code !== '23505') {
-                            this.showNotification('Error downvoting comment', true);
-                            console.error('Downvote error:', error);
-                        } else {
-                            await this.renderPosts();
+                    button.addEventListener('click', async (e) => {
+                        if (button.classList.contains('voted')) return;
+
+                        const commentId = parseInt(button.getAttribute('data-comment'));
+                        for (const post of samplePosts) {
+                            const comment = post.comments.find(c => c.id === commentId);
+                            if (comment) {
+                                comment.downvotes++;
+                                const countElement = button.querySelector('.vote-count');
+                                countElement.textContent = comment.downvotes;
+
+                                button.classList.add('voted');
+                                button.style.color = 'var(--downvote)';
+                                setTimeout(() => {
+                                    button.style.color = '';
+                                }, 300);
+                                break;
+                            }
                         }
                     });
                 });
 
-                // Comment submission
                 document.querySelectorAll('.comment-form button').forEach(button => {
-                    button.addEventListener('click', async () => {
-                        const form = button.closest('.comment-form');
-                        const postId = form.getAttribute('data-post');
+                    button.addEventListener('click', function() {
+                        const form = this.closest('.comment-form');
+                        const postId = parseInt(form.getAttribute('data-post'));
+                        const authorInput = form.querySelector('.comment-author');
                         const textarea = form.querySelector('textarea');
+                        const author = authorInput.value.trim() || "user_" + Math.floor(Math.random() * 10000);
                         const content = textarea.value.trim();
 
-                        if (!content) {
-                            this.showNotification('Please enter a comment', true);
-                            return;
-                        }
-
-                        const { error } = await supabase
-                            .from('comments')
-                            .insert({ post_id: postId, author_id: (await supabase.auth.getUser()).data.user.id, content });
-
-                        if (error) {
-                            this.showNotification('Error posting comment', true);
-                            console.error('Comment error:', error);
+                        if (content) {
+                            const post = samplePosts.find(p => p.id === postId);
+                            if (post) {
+                                const newComment = {
+                                    id: Math.max(...post.comments.map(c => c.id), 0) + 1,
+                                    author,
+                                    content,
+                                    upvotes: 0,
+                                    downvotes: 0,
+                                    created_at: new Date().toISOString()
+                                };
+                                post.comments.unshift(newComment);
+                                uiController.renderPosts();
+                                uiController.showNotification("Your comment has been posted!");
+                                textarea.value = '';
+                                authorInput.value = '';
+                            }
                         } else {
-                            textarea.value = '';
-                            this.showNotification('Comment posted successfully!');
-                            await this.renderPosts();
+                            uiController.showNotification("Please enter a comment before submitting.");
                         }
                     });
                 });
             }
         };
 
-        // Initialize
+        // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
             uiController.renderPosts();
         });
