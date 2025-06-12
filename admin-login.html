@@ -129,7 +129,7 @@
             if (typeof supabase === 'undefined') {
                 throw new Error('Supabase library not loaded. Please check your network and try again.');
             }
-            supabaseClient = supabase.createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+            supabaseClient = supabase.createClient('https://tdwerbqbgcmszolvjvca.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8');
         } catch (error) {
             showNotification(error.message);
             console.error('Supabase initialization failed:', error);
