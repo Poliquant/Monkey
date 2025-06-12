@@ -237,7 +237,7 @@
     </div>
 
     <footer class="footer">
-        <p>&copy; 2025 Prompt Monkeys. All rights reserved.</p>
+        <p>© 2025 Prompt Monkeys. All rights reserved.</p>
         <p>
             <a href="https://x.com/your-profile"><i class="fab fa-twitter"></i></a>
             <a href="https://discord.com/your-server"><i class="fab fa-discord"></i></a>
@@ -301,18 +301,17 @@
                 loginButton.textContent = 'Logging in...';
 
                 try {
+                    // Sign in with Supabase Auth
                     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                         email,
                         password
                     });
                     if (authError) throw new Error(authError.message);
 
+                    // Check if user is super admin
                     const { data: userData, error: userError } = await supabase
-                        .from('users')
-                        .select('is_admin')
-                        .eq('email', email)
-                        .single();
-                    if (userError || !userData?.is_admin) {
+                        .rpc('get_user_by_id', { user_id: authData.user.id });
+                    if (userError || !userData?.is_super_admin) {
                         await supabase.auth.signOut();
                         throw new Error('Not an admin');
                     }
