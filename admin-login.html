@@ -248,14 +248,14 @@
     <script>
         const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
-        let supabase;
+        let supabase = null;
 
         try {
             supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         } catch (error) {
             showNotification('Failed to initialize Supabase: Invalid API key or configuration', true);
             console.error('Supabase init error:', error);
-            return;
+            // Skip further execution without 'return'
         }
 
         function showNotification(message, isError = false) {
