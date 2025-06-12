@@ -247,7 +247,7 @@
 
     <script>
         const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
         let supabase;
 
         try {
@@ -316,9 +316,13 @@
                         .select('id, is_super_admin')
                         .eq('id', authData.user.id)
                         .single();
-                    if (userError || !userData) {
+                    if (userError) {
                         await supabase.auth.signOut();
-                        throw new Error('User data not found');
+                        throw new Error('Failed to fetch user data: ' + userError.message);
+                    }
+                    if (!userData) {
+                        await supabase.auth.signOut();
+                        throw new Error('User not found');
                     }
                     if (!userData.is_super_admin) {
                         await supabase.auth.signOut();
