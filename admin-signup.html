@@ -3,134 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Monkeys - Admin Signup</title>
+    <title>Admin Signup - Prompt Monkeys</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
-        }
         :root {
             --primary: #1DB954;
             --primary-dark: #1AA34A;
-            --secondary: #191414;
             --background: #121212;
             --card-bg: #1f1f1f;
             --text: #FFFFFF;
             --text-light: #B3B3B3;
-            --border: #333;
             --error: #FF4D4D;
         }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
         body {
-            background-color: var(--background);
+            background: var(--background);
             color: var(--text);
             min-height: 100vh;
-            background-image: radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.08) 0%, transparent 40%);
-            padding-top: 90px;
-            padding-bottom: 70px;
-            display: flex;
-            flex-direction: column;
-        }
-        .header {
-            background-color: var(--secondary);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 100;
-            padding: 20px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid var(--primary);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .logo h1 {
-            color: var(--primary);
-            font-size: 2rem;
-            font-weight: 700;
-        }
-        .logo i {
-            font-size: 2rem;
-            color: var(--primary);
-            transform: rotate(-5deg);
-            transition: transform 0.3s;
-        }
-        .logo i:hover {
-            transform: rotate(5deg);
-        }
-        .nav-links {
-            display: flex;
-            gap: 20px;
-        }
-        .nav-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            padding: 10px 15px;
-            border-radius: 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1rem;
-        }
-        .nav-links a:hover, .nav-links a.active {
-            background-color: rgba(29, 185, 84, 0.2);
-            color: var(--primary);
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 30px 5%;
-            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
-        .signup-section {
-            background-color: var(--card-bg);
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
             border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border);
             width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         h2 {
             color: var(--primary);
             font-size: 1.8rem;
-            margin-bottom: 20px;
             text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            margin-bottom: 20px;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        .form-group label {
+        label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
             color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
         }
         input {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
+            border: 1px solid var(--text-light);
             border-radius: 8px;
-            border: 1px solid var(--border);
-            background: rgba(18, 18, 18, 0.7);
+            background: #2a2a2a;
             color: var(--text);
             font-size: 1rem;
-            transition: border-color 0.3s;
         }
         input:focus {
             outline: none;
@@ -138,194 +69,78 @@
         }
         .error-message {
             color: var(--error);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             margin-top: 5px;
             display: none;
         }
-        .btn {
+        button {
+            width: 100%;
+            padding: 12px;
             background: var(--primary);
-            color: white;
             border: none;
-            border-radius: 30px;
-            padding: 14px 25px;
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            transition: background 0.3s;
         }
-        .btn:hover {
+        button:hover {
             background: var(--primary-dark);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(29, 185, 84, 0.3);
         }
         .notification {
             position: fixed;
-            top: 100px;
-            right: 30px;
-            background: var(--primary);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: var(--text);
             z-index: 1000;
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
+            transform: translateX(120%);
+            transition: transform 0.3s;
         }
         .notification.show {
             transform: translateX(0);
         }
+        .notification.success {
+            background: var(--primary);
+        }
         .notification.error {
             background: var(--error);
         }
-        .footer {
-            background-color: var(--secondary);
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            z-index: 100;
-            padding: 15px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 2px solid var(--primary);
-            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
-        }
-        .footer .logo {
-            justify-content: center;
-        }
-        .footer-links {
-            display: flex;
-            gap: 15px;
-        }
-        .footer-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            padding: 8px 12px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.95rem;
-        }
-        .footer-links a:hover {
-            background-color: rgba(29, 185, 84, 0.15);
-            color: var(--primary);
-        }
-        .social-links {
-            display: flex;
-            gap: 15px;
-        }
-        .social-links a {
-            color: var(--text-light);
-            font-size: 1.2rem;
-            transition: all 0.3s;
-        }
-        .social-links a:hover {
-            color: var(--primary);
-            transform: translateY(-3px);
-        }
-        @media (max-width: 768px) {
-            body {
-                padding-top: 130px;
-                padding-bottom: 100px;
-            }
-            .header {
-                flex-direction: column;
-                padding: 15px;
-            }
-            .nav-links {
-                margin-top: 20px;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 10px;
-            }
+        @media (max-width: 480px) {
             .container {
                 padding: 20px;
             }
-            .signup-section {
-                padding: 30px 20px;
-            }
-            .footer {
-                flex-direction: column;
-                padding: 15px;
-                gap: 15px;
-            }
-            .footer-links {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 10px;
+            h2 {
+                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="notification" id="notification"></div>
-
-    <header class="header">
-        <div class="logo">
-            <i class="fas fa-monkey"></i>
-            <h1>Prompt Monkeys</h1>
-        </div>
-        <nav class="nav-links">
-            <a href="index.html"><i class="fas fa-home"></i> Home</a>
-            <a href="chat.html"><i class="fas fa-comments"></i> Chat</a>
-            <a href="earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
-            <a href="advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
-            <a href="admin-dashboard.html"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
-            <a href="admin-signup.html" class="active"><i class="fas fa-user-plus"></i> Admin Signup</a>
-        </nav>
-    </header>
-
     <div class="container">
-        <div class="signup-section">
-            <h2><i class="fas fa-user-plus"></i> Create New Admin</h2>
-            <form id="signupForm">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="Enter email" required>
-                    <div class="error-message" id="email-error">Please enter a valid email</div>
-                </div>
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter username" required>
-                    <div class="error-message" id="username-error">Username must be 3-50 characters</div>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter password" required>
-                    <div class="error-message" id="password-error">Password must be at least 6 characters</div>
-                </div>
-                <button type="submit" class="btn"><i class="fas fa-user-plus"></i> Create Admin</button>
-            </form>
-        </div>
+        <h2><i class="fas fa-user-plus"></i> Admin Signup</h2>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter email" required>
+                <div class="error-message" id="email-error">Invalid email format</div>
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username" required>
+                <div class="error-message" id="username-error">3-50 characters required</div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password" required>
+                <div class="error-message" id="password-error">Minimum 6 characters</div>
+            </div>
+            <button type="submit"><i class="fas fa-user-plus"></i> Create Admin</button>
+        </form>
     </div>
-
-    <footer class="footer">
-        <div class="logo">
-            <i class="fas fa-monkey"></i>
-            <h1>Prompt Monkeys</h1>
-        </div>
-        <div class="footer-links">
-            <a href="about.html">About Us</a>
-            <a href="privacy.html">Privacy Policy</a>
-            <a href="terms.html">Terms of Service</a>
-            <a href="contact.html">Contact</a>
-            <a href="faq.html">FAQ</a>
-        </div>
-        <div class="social-links">
-            <a href="https://x.com"><i class="fab fa-twitter"></i></a>
-            <a href="https://discord.com"><i class="fab fa-discord"></i></a>
-            <a href="https://linkedin.com"><i class="fab fa-linkedin"></i></a>
-            <a href="https://youtube.com"><i class="fab fa-youtube"></i></a>
-        </div>
-    </footer>
 
     <script>
         const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
@@ -335,7 +150,7 @@
         try {
             supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         } catch (error) {
-            showNotification('Failed to initialize Supabase client', true);
+            showNotification('Failed to initialize Supabase', true);
             console.error('Supabase init error:', error);
         }
 
@@ -343,18 +158,19 @@
             const notification = document.getElementById('notification');
             notification.textContent = message;
             notification.classList.toggle('error', isError);
+            notification.classList.toggle('success', !isError);
             notification.classList.add('show');
             setTimeout(() => notification.classList.remove('show'), 3000);
         }
 
         async function checkAdminStatus() {
             if (!supabase) {
-                showNotification('Supabase client not initialized', true);
+                showNotification('Supabase not initialized', true);
                 return false;
             }
             const { data: { user }, error } = await supabase.auth.getUser();
-            if (error || !user || !user.email_confirmed_at) {
-                showNotification('Please log in and verify your email', true);
+            if (error || !user) {
+                showNotification('Please log in', true);
                 setTimeout(() => window.location.href = 'admin-login.html', 2000);
                 return false;
             }
@@ -364,7 +180,7 @@
                 .eq('id', user.id)
                 .single();
             if (adminError || !adminData?.is_admin) {
-                showNotification('Access denied: Admins only', true);
+                showNotification('Admins only', true);
                 setTimeout(() => window.location.href = 'chat.html', 2000);
                 return false;
             }
@@ -411,17 +227,13 @@
                         p_password: password,
                         p_username: username
                     });
-                    if (error) {
-                        throw new Error(error.message || 'Failed to create admin');
-                    }
-                    if (!data) {
-                        throw new Error('No user ID returned');
-                    }
+                    if (error) throw new Error(error.message || 'Failed to create admin');
+                    if (!data) throw new Error('No user ID returned');
 
-                    showNotification('Admin created successfully!');
+                    showNotification('Admin created!');
                     setTimeout(() => window.location.href = 'admin-dashboard.html', 1000);
                 } catch (error) {
-                    showNotification(error.message || 'Failed to create admin', true);
+                    showNotification(error.message || 'Signup failed', true);
                     console.error('Signup error:', error);
                 }
             });
