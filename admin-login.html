@@ -247,14 +247,15 @@
 
     <script>
         const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+        const supabaseKey = 'YOUR_NEW_ANON_KEY_HERE'; // Replace with regenerated anon key from Supabase Dashboard
         let supabase;
 
         try {
             supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
         } catch (error) {
-            showNotification('Failed to initialize Supabase: ' + error.message, true);
+            showNotification('Failed to initialize Supabase: Invalid API key or configuration', true);
             console.error('Supabase init error:', error);
+            return;
         }
 
         function showNotification(message, isError = false) {
@@ -270,12 +271,13 @@
             const loginForm = document.getElementById('loginForm');
             const loginButton = document.getElementById('loginButton');
 
+            if (!supabase) {
+                showNotification('Supabase client not initialized', true);
+                return;
+            }
+
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if (!supabase) {
-                    showNotification('Supabase not initialized', true);
-                    return;
-                }
 
                 const email = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value.trim();
@@ -307,7 +309,7 @@
                         password
                     });
                     if (authError) {
-                        throw new Error('Invalid email or password: ' + authError.message);
+                        throw new Error(`Authentication failed: ${authError.message}`);
                     }
 
                     // Check if user is super admin
@@ -318,7 +320,7 @@
                         .single();
                     if (userError) {
                         await supabase.auth.signOut();
-                        throw new Error('Failed to fetch user data: ' + userError.message);
+                        throw new Error(`Failed to fetch user data: ${userError.message}`);
                     }
                     if (!userData) {
                         await supabase.auth.signOut();
