@@ -247,7 +247,7 @@
 
     <script>
         const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6e7Ixc8e';
         let supabase;
 
         try {
@@ -308,10 +308,10 @@
                     });
                     if (authError) throw new Error(authError.message);
 
-                    // Check if user is super admin
-                    const { data: userData, error: userError } = await supabase
+                    // Check if user is admin
+                    const { data: userData, error: adminError } = await supabase
                         .rpc('get_user_by_id', { user_id: authData.user.id });
-                    if (userError || !userData?.is_super_admin) {
+                    if (adminError || !userData?.is_super_admin) {
                         await supabase.auth.signOut();
                         throw new Error('Not an admin');
                     }
