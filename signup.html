@@ -1,9 +1,8 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Sign Up | Prompt Monkeys</title>
   <meta name="description" content="Create a Prompt Monkeys account to join financial discussions, access market analysis, and explore earnings insights.">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -13,7 +12,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
     :root {
       --primary: #1DB954;
@@ -30,13 +29,14 @@
     body {
       background-color: var(--background);
       color: var(--text);
-      padding-top: 90px;
-      padding-bottom: 70px;
+      padding-top: 80px;
+      padding-bottom: 80px;
       background-image: radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.08) 0%, transparent 40%);
-      line-height: 1.6;
+      line-height: 1.5;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      -webkit-text-size-adjust: 100%;
     }
     .header {
       background-color: var(--secondary);
@@ -44,99 +44,117 @@
       top: 0;
       width: 100%;
       z-index: 100;
-      padding: 20px 5%;
+      padding: 15px 4%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 3px solid var(--primary);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      border-bottom: 2px solid var(--primary);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
     .logo {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 10px;
     }
     .logo h1 {
       color: var(--primary);
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
     .logo i {
-      font-size: 2rem;
+      font-size: 1.5rem;
       color: var(--primary);
       transform: rotate(-5deg);
       transition: transform 0.3s;
     }
-    .logo i:hover {
-      transform: rotate(5deg);
-    }
     .nav-links {
-      display: flex;
-      gap: 20px;
+      display: none; /* Hidden on mobile by default */
     }
-    .nav-links a {
+    .mobile-menu-btn {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: block;
+    }
+    .mobile-menu {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      width: 100%;
+      background-color: var(--secondary);
+      padding: 15px 0;
+      border-bottom: 2px solid var(--primary);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      display: none;
+      flex-direction: column;
+      z-index: 99;
+    }
+    .mobile-menu.active {
+      display: flex;
+    }
+    .mobile-menu a {
       color: var(--text-light);
       text-decoration: none;
+      padding: 12px 20px;
       font-weight: 600;
-      transition: all 0.3s;
-      padding: 10px 15px;
-      border-radius: 25px;
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 1rem;
     }
-    .nav-links a:hover,
-    .nav-links a.active {
+    .mobile-menu a:hover {
       background-color: rgba(29,185,84,0.2);
       color: var(--primary);
-      transform: scale(1.05);
     }
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 30px 5%;
+      width: 100%;
+      padding: 20px 4%;
       flex: 1;
     }
     .signup-container {
-      max-width: 500px;
+      width: 100%;
       margin: 0 auto;
       background-color: var(--card-bg);
-      border-radius: 12px;
-      padding: 40px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       border: 1px solid var(--border);
+      max-width: 100%;
     }
     .signup-header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
     .signup-header h2 {
       color: var(--primary);
-      font-size: 2rem;
-      margin-bottom: 10px;
+      font-size: 1.8rem;
+      margin-bottom: 8px;
     }
     .signup-header p {
       color: var(--text-light);
+      font-size: 0.95rem;
     }
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
     .form-group label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       font-weight: 600;
+      font-size: 0.95rem;
     }
     .form-control {
       width: 100%;
       padding: 12px 15px;
       background-color: var(--background);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 6px;
       color: var(--text);
       font-size: 1rem;
       transition: border-color 0.3s;
+      -webkit-appearance: none;
     }
     .form-control:focus {
       outline: none;
@@ -148,12 +166,12 @@
       gap: 8px;
       background: var(--primary);
       color: white;
-      padding: 12px 25px;
+      padding: 12px 20px;
       border-radius: 25px;
       text-decoration: none;
       font-weight: bold;
       transition: all 0.3s;
-      font-size: 1.1rem;
+      font-size: 1rem;
       border: none;
       cursor: pointer;
       width: 100%;
@@ -162,26 +180,22 @@
     }
     .btn:hover {
       background: var(--primary-dark);
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(29,185,84,0.3);
     }
     .signup-footer {
       text-align: center;
-      margin-top: 25px;
+      margin-top: 20px;
       color: var(--text-light);
+      font-size: 0.95rem;
     }
     .signup-footer a {
       color: var(--primary);
       text-decoration: none;
       font-weight: 600;
     }
-    .signup-footer a:hover {
-      text-decoration: underline;
-    }
     .error-message {
       color: var(--error);
-      font-size: 0.9rem;
-      margin-top: 5px;
+      font-size: 0.85rem;
+      margin-top: 4px;
       display: none;
     }
     .footer {
@@ -190,35 +204,29 @@
       bottom: 0;
       width: 100%;
       z-index: 100;
-      padding: 15px 5%;
+      padding: 12px 4%;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
       border-top: 2px solid var(--primary);
-      box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
     }
     .footer .logo {
-      justify-content: center;
+      margin-bottom: 10px;
     }
     .footer-links {
       display: flex;
-      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
     }
     .footer-links a {
       color: var(--text-light);
       text-decoration: none;
       font-weight: 600;
-      transition: all 0.3s;
-      padding: 8px 12px;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.95rem;
-    }
-    .footer-links a:hover {
-      background-color: rgba(29,185,84,0.15);
-      color: var(--primary);
+      font-size: 0.85rem;
+      padding: 6px 10px;
     }
     .social-links {
       display: flex;
@@ -226,63 +234,64 @@
     }
     .social-links a {
       color: var(--text-light);
-      font-size: 1.2rem;
-      transition: all 0.3s;
+      font-size: 1.1rem;
     }
-    .social-links a:hover {
-      color: var(--primary);
-      transform: translateY(-3px);
+    
+    /* Larger mobile devices and tablets */
+    @media (min-width: 481px) {
+      .header {
+        padding: 15px 5%;
+      }
+      .container {
+        padding: 20px 5%;
+      }
+      .signup-container {
+        max-width: 400px;
+        padding: 30px;
+      }
     }
-    @media (max-width: 900px) {
+    
+    /* Desktop and larger tablets */
+    @media (min-width: 769px) {
+      body {
+        padding-top: 90px;
+        padding-bottom: 70px;
+      }
+      .header {
+        padding: 20px 5%;
+      }
+      .mobile-menu-btn {
+        display: none;
+      }
       .nav-links {
+        display: flex;
         gap: 15px;
-        font-size: .95rem;
       }
       .nav-links a {
+        color: var(--text-light);
+        text-decoration: none;
+        font-weight: 600;
         padding: 8px 12px;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
       }
-    }
-    @media (max-width: 600px) {
-      .header {
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px 3%;
-      }
-      .nav-links {
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-      .logo h1 {
-        font-size: 1.6rem;
-      }
-      .logo i {
-        font-size: 1.6rem;
-      }
-    }
-    @media (max-width: 768px) {
-      body {
-        padding-top: 130px;
-        padding-bottom: 100px;
-      }
-      .signup-container {
-        padding: 30px 20px;
+      .nav-links a:hover {
+        background-color: rgba(29,185,84,0.2);
+        color: var(--primary);
       }
       .footer {
-        flex-direction: column;
-        padding: 15px;
-        gap: 15px;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 15px 5%;
+      }
+      .footer .logo {
+        margin-bottom: 0;
       }
       .footer-links {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-      }
-    }
-    @media (max-width: 480px) {
-      .signup-container {
-        padding: 15px;
+        margin-bottom: 0;
       }
     }
   </style>
@@ -293,6 +302,9 @@
       <i class="fas fa-monkey"></i>
       <h1>Prompt Monkeys</h1>
     </div>
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
     <nav class="nav-links">
       <a href="index.html"><i class="fas fa-home"></i> Home</a>
       <a href="login.html"><i class="fas fa-comments"></i> Chat</a>
@@ -301,6 +313,14 @@
       <a href="admin-login.html"><i class="fas fa-lock"></i> Admin</a>
     </nav>
   </header>
+  
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+    <a href="login.html"><i class="fas fa-comments"></i> Chat</a>
+    <a href="earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
+    <a href="advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
+    <a href="admin-login.html"><i class="fas fa-lock"></i> Admin</a>
+  </div>
 
   <div class="container">
     <div class="signup-container">
@@ -350,35 +370,48 @@
     </div>
     <div class="footer-links">
       <a href="about.html">About Us</a>
-      <a href="privacy.html">Privacy Policy</a>
+      <a href="privacy.html">Privacy</a>
       <a href="terms.html">Terms</a>
       <a href="contact.html">Contact</a>
-      <a href="faq.html">FAQ</a>
     </div>
     <div class="social-links">
       <a href="https://x.com"><i class="fab fa-twitter"></i></a>
       <a href="https://discord.com"><i class="fab fa-discord"></i></a>
       <a href="https://linkedin.com"><i class="fab fa-linkedin"></i></a>
-      <a href="https://youtube.com"><i class="fab fa-youtube"></i></a>
     </div>
   </footer>
 
   <script>
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!mobileMenu.contains(e.target) && e.target !== mobileMenuBtn) {
+        mobileMenu.classList.remove('active');
+      }
+    });
+
     // Initialize Supabase client
     const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+    
     try {
       if (!window.supabase) {
         throw new Error('Supabase library not loaded');
       }
       const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-      console.log('Supabase client initialized:', !!supabase);
 
       document.getElementById('signupForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const username = document.getElementById('username').value;
-        const email = document.getElementById('email').value;
+        const username = document.getElementById('username').value.trim();
+        const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirm-password').value;
 
@@ -396,20 +429,20 @@
         let isValid = true;
 
         // Username validation
-        if (!username || username.length < 3) {
+        if (username.length < 3) {
           usernameError.style.display = 'block';
           isValid = false;
         }
 
         // Email validation
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
           emailError.textContent = 'Please enter a valid email address';
           emailError.style.display = 'block';
           isValid = false;
         }
 
         // Password validation
-        if (!password || password.length < 8) {
+        if (password.length < 8) {
           passwordError.style.display = 'block';
           isValid = false;
         }
@@ -422,7 +455,6 @@
 
         if (isValid) {
           try {
-            console.log('Attempting signup with:', { email, username });
             const { data, error } = await supabase.auth.signUp({
               email,
               password,
@@ -432,25 +464,23 @@
             });
 
             if (error) {
-              console.error('Signup error:', error);
-              emailError.textContent = error.message || 'Signup failed. Please try again.';
+              emailError.textContent = error.message.includes('User already registered') 
+                ? 'This email is already registered. Please login.' 
+                : (error.message || 'Signup failed. Please try again.');
               emailError.style.display = 'block';
               return;
             }
 
-            console.log('Signup success:', data.user);
             alert('Sign-up successful! Please check your email for verification.');
             window.location.href = 'login.html';
           } catch (err) {
-            console.error('Unexpected error during signup:', err);
             emailError.textContent = `Signup error: ${err.message || 'Please try again.'}`;
             emailError.style.display = 'block';
           }
         }
       });
     } catch (initError) {
-      console.error('Failed to initialize Supabase client:', initError.message, initError.stack);
-      alert(`Failed to connect to the database: ${initError.message}. Please try again later.`);
+      alert(`Failed to connect to the database. Please try again later.`);
     }
   </script>
 </body>
