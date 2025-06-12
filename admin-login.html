@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prompt Monkeys - Admin Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -123,52 +123,58 @@
             setTimeout(() => notification.classList.remove('show'), 3000);
         }
 
-        // Wait for DOM and Supabase script to load
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if supabase is defined
+        // Initialize Supabase client with error handling
+        let supabaseClient;
+        try {
             if (typeof supabase === 'undefined') {
-                showNotification('Supabase library failed to load. Please try again later.');
+                throw new Error('Supabase library not loaded. Please check your network and try again.');
+            }
+            supabaseClient = supabase.createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+        } catch (error) {
+            showNotification(error.message);
+            console.error('Supabase initialization failed:', error);
+        }
+
+        // Login function
+        async function login() {
+            if (!supabaseClient) {
+                showNotification('Supabase client not initialized. Please refresh the page.');
                 return;
             }
 
-            // Initialize Supabase client
-            const supabaseClient = supabase.createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            if (!email || !password) {
+                showNotification('Please enter both email and password.');
+                return;
+            }
 
-            // Login function
-            window.login = async function() {
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value.trim();
-                if (!email || !password) {
-                    showNotification('Please enter both email and password.');
-                    return;
+            try {
+                // Sign in with Supabase
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                if (error) throw new Error(error.message);
+
+                // Check if the user is an admin
+                const { data: adminData, error: adminError } = await supabaseClient
+                    .from('admins')
+                    .select('is_admin')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (adminError || !adminData?.is_admin) {
+                    throw new Error('Access denied: Not an admin');
                 }
 
-                try {
-                    // Sign in with Supabase
-                    const { data, error } = await supabaseClient.auth.signInWithPassword({
-                        email,
-                        password
-                    });
-                    if (error) throw new Error(error.message);
-
-                    // Check if the user is an admin
-                    const { data: adminData, error: adminError } = await supabaseClient
-                        .from('admins')
-                        .select('is_admin')
-                        .eq('id', data.user.id 
-                        .single();
-
-                    if (adminError || !adminData?.is_admin) {
-                        throw new Error('Access denied: Not an admin');
-                    }
-
-                    // Redirect to admin portal
-                    window.location.href = 'admin-portal.html';
-                } catch (error) {
-                    showNotification(error.message);
-                }
-            };
-        });
+                // Redirect to admin portal
+                window.location.href = 'admin-portal.html';
+            } catch (error) {
+                showNotification(error.message);
+                console.error('Login error:', error);
+            }
+        }
     </script>
 </body>
 </html>
