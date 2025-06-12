@@ -11,9 +11,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
         }
-
         :root {
             --primary: #1DB954;
             --primary-dark: #1AA34A;
@@ -23,158 +22,384 @@
             --text: #FFFFFF;
             --text-light: #B3B3B3;
             --border: #333;
+            --error: #FF4D4D;
         }
-
         body {
             background-color: var(--background);
             color: var(--text);
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.08) 0%, transparent 40%);
+            padding-top: 90px;
+            padding-bottom: 70px;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: var(--secondary);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--primary);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo h1 {
+            color: var(--primary);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+            transform: rotate(-5deg);
+            transition: transform 0.3s;
+        }
+        .logo i:hover {
+            transform: rotate(5deg);
+        }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 10px 15px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            background-color: rgba(29, 185, 84, 0.2);
+            color: var(--primary);
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 30px 5%;
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background-image: radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.08) 0%, transparent 40%);
         }
-
-        .container {
-            max-width: 400px;
-            width: 100%;
-            padding: 20px;
-        }
-
         .login-section {
             background-color: var(--card-bg);
             border-radius: 12px;
-            padding: 30px;
+            padding: 40px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border);
+            width: 100%;
         }
-
         h2 {
             color: var(--primary);
+            font-size: 1.8rem;
             margin-bottom: 20px;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
         input {
             width: 100%;
             padding: 12px;
-            margin-bottom: 15px;
             border-radius: 8px;
             border: 1px solid var(--border);
             background: rgba(18, 18, 18, 0.7);
             color: var(--text);
             font-size: 1rem;
+            transition: border-color 0.3s;
         }
-
-        button {
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .error-message {
+            color: var(--error);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+        .btn {
             background: var(--primary);
             color: white;
             border: none;
             border-radius: 30px;
-            padding: 12px 25px;
+            padding: 14px 25px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.1rem;
             transition: all 0.3s;
             width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-
-        button:hover {
+        .btn:hover {
             background: var(--primary-dark);
             transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(29, 185, 84, 0.3);
         }
-
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 100px;
+            right: 30px;
             background: var(--primary);
             color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
             z-index: 1000;
             transform: translateX(150%);
             transition: transform 0.3s ease;
         }
-
         .notification.show {
             transform: translateX(0);
+        }
+        .notification.error {
+            background: var(--error);
+        }
+        .footer {
+            background-color: var(--secondary);
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px solid var(--primary);
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .footer .logo {
+            justify-content: center;
+        }
+        .footer-links {
+            display: flex;
+            gap: 15px;
+        }
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        .footer-links a:hover {
+            background-color: rgba(29, 185, 84, 0.15);
+            color: var(--primary);
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        .social-links a {
+            color: var(--text-light);
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        .social-links a:hover {
+            color: var(--primary);
+            transform: translateY(-3px);
+        }
+        @media (max-width: 768px) {
+            body {
+                padding-top: 130px;
+                padding-bottom: 100px;
+            }
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            .container {
+                padding: 20px;
+            }
+            .login-section {
+                padding: 30px 20px;
+            }
+            .footer {
+                flex-direction: column;
+                padding: 15px;
+                gap: 15px;
+            }
+            .footer-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="notification" id="notification"></div>
+
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-monkey"></i>
+            <h1>Prompt Monkeys</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html"><i class="fas fa-home"></i> Home</a>
+            <a href="chat.html"><i class="fas fa-comments"></i> Chat</a>
+            <a href="earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
+            <a href="advertise.html"><i class="fas fa-bullhorn"></i> Advertise</a>
+            <a href="admin-login.html" class="active"><i class="fas fa-lock"></i> Admin</a>
+        </nav>
+    </header>
+
     <div class="container">
-        <div class="login-section" id="login-section">
-            <h2>Admin Login</h2>
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button onclick="login()">Login</button>
+        <div class="login-section">
+            <h2><i class="fas fa-lock"></i> Admin Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter email" required>
+                    <div class="error-message" id="email-error">Please enter a valid email</div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                    <div class="error-message" id="password-error">Password cannot be empty</div>
+                </div>
+                <button type="submit" class="btn"><i class="fas fa-sign-in-alt"></i> Login</button>
+            </form>
         </div>
     </div>
 
+    <footer class="footer">
+        <div class="logo">
+            <i class="fas fa-monkey"></i>
+            <h1>Prompt Monkeys</h1>
+        </div>
+        <div class="footer-links">
+            <a href="about.html">About Us</a>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Service</a>
+            <a href="contact.html">Contact</a>
+            <a href="faq.html">FAQ</a>
+        </div>
+        <div class="social-links">
+            <a href="https://x.com"><i class="fab fa-twitter"></i></a>
+            <a href="https://discord.com"><i class="fab fa-discord"></i></a>
+            <a href="https://linkedin.com"><i class="fab fa-linkedin"></i></a>
+            <a href="https://youtube.com"><i class="fab fa-youtube"></i></a>
+        </div>
+    </footer>
+
     <script>
-        // Show notification
-        function showNotification(message) {
+        let supabaseClient;
+        try {
+            supabaseClient = supabase.createClient(
+                'https://tdwerbqbgcmszolvjvca.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDI3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8'
+            );
+        } catch (error) {
+            showNotification('Failed to initialize Supabase client', true);
+            console.error('Supabase initialization failed:', error);
+        }
+
+        function showNotification(message, isError = false) {
             const notification = document.getElementById('notification');
             notification.textContent = message;
+            notification.classList.toggle('error', isError);
             notification.classList.add('show');
             setTimeout(() => notification.classList.remove('show'), 3000);
         }
 
-        // Initialize Supabase client with error handling
-        let supabaseClient;
-        try {
-            if (typeof supabase === 'undefined') {
-                throw new Error('Supabase library not loaded. Please check your network and try again.');
-            }
-            supabaseClient = supabase.createClient('https://tdwerbqbgcmszolvjvca.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8');
-        } catch (error) {
-            showNotification(error.message);
-            console.error('Supabase initialization failed:', error);
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('login-form');
 
-        // Login function
-        async function login() {
-            if (!supabaseClient) {
-                showNotification('Supabase client not initialized. Please refresh the page.');
-                return;
-            }
-
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            if (!email || !password) {
-                showNotification('Please enter both email and password.');
-                return;
-            }
-
-            try {
-                // Sign in with Supabase
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email,
-                    password
-                });
-                if (error) throw new Error(error.message);
-
-                // Check if the user is an admin
-                const { data: adminData, error: adminError } = await supabaseClient
-                    .from('admins')
-                    .select('is_admin')
-                    .eq('id', data.user.id)
-                    .single();
-
-                if (adminError || !adminData?.is_admin) {
-                    throw new Error('Access denied: Not an admin');
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!supabaseClient) {
+                    showNotification('Supabase client not initialized', true);
+                    return;
                 }
 
-                // Redirect to admin portal
-                window.location.href = 'admin-portal.html';
-            } catch (error) {
-                showNotification(error.message);
-                console.error('Login error:', error);
-            }
-        }
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value.trim();
+                const emailError = document.getElementById('email-error');
+                const passwordError = document.getElementById('password-error');
+
+                emailError.style.display = 'none';
+                passwordError.style.display = 'none';
+
+                let isValid = true;
+                if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    emailError.style.display = 'block';
+                    isValid = false;
+                }
+                if (!password) {
+                    passwordError.style.display = 'block';
+                    isValid = false;
+                }
+
+                if (!isValid) return;
+
+                try {
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({
+                        email,
+                        password
+                    });
+                    if (error) throw new Error(error.message);
+
+                    if (!data.user.email_confirmed_at) {
+                        throw new Error('Please verify your email');
+                    }
+
+                    const { data: adminData, error: adminError } = await supabaseClient
+                        .from('admins')
+                        .select('is_admin')
+                        .eq('id', data.user.id)
+                        .single();
+
+                    if (adminError || !adminData?.is_admin) {
+                        throw new Error('Access denied: Not an admin');
+                    }
+
+                    showNotification('Login successful!');
+                    setTimeout(() => window.location.href = 'admin-dashboard.html', 1000);
+                } catch (error) {
+                    showNotification(error.message, true);
+                    console.error('Login error:', error);
+                }
+            });
+        });
     </script>
 </body>
 </html>
