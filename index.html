@@ -28,7 +28,7 @@
     body {
       background-color: var(--background);
       color: var(--text);
-      padding-top: 90px;
+      padding-top: 70px;
       background-image: radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.08) 0%, transparent 40%);
       line-height: 1.6;
     }
@@ -38,7 +38,7 @@
       top: 0;
       width: 100%;
       z-index: 100;
-      padding: 20px 5%;
+      padding: 15px 5%;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -48,16 +48,16 @@
     .logo {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 10px;
     }
     .logo h1 {
       color: var(--primary);
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.5px;
     }
     .logo i {
-      font-size: 2rem;
+      font-size: 1.5rem;
       color: var(--primary);
       transform: rotate(-5deg);
       transition: transform 0.3s;
@@ -67,19 +67,22 @@
     }
     .nav-links {
       display: flex;
-      gap: 20px;
+      gap: 10px;
     }
     .nav-links a {
       color: var(--text-light);
       text-decoration: none;
       font-weight: 600;
       transition: all 0.3s;
-      padding: 10px 15px;
+      padding: 8px 12px;
       border-radius: 25px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 1rem;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+    .nav-links a i {
+      font-size: 0.9rem;
     }
     .nav-links a:hover, .nav-links a.active {
       background-color: rgba(29, 185, 84, 0.2);
@@ -89,47 +92,51 @@
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 30px 5%;
+      padding: 20px 4%;
     }
     .hero {
       text-align: center;
-      padding: 60px 0 40px;
+      padding: 40px 0 30px;
       background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, transparent 100%);
       border-radius: 12px;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
     .hero h1 {
-      font-size: 2.8rem;
-      margin-bottom: 20px;
+      font-size: 2rem;
+      margin-bottom: 15px;
       color: var(--primary);
       line-height: 1.2;
     }
     .hero p {
-      font-size: 1.2rem;
+      font-size: 1rem;
       max-width: 700px;
-      margin: 0 auto 30px;
+      margin: 0 auto 20px;
       color: var(--text-light);
+      padding: 0 10px;
     }
     .section {
       background-color: var(--card-bg);
       border-radius: 12px;
-      padding: 30px;
+      padding: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
       border: 1px solid var(--border);
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
     h2 {
       color: var(--primary);
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 1.8rem;
+      gap: 8px;
+      font-size: 1.5rem;
+    }
+    h2 i {
+      font-size: 1.3rem;
     }
     h3 {
       color: var(--text);
-      margin: 20px 0 10px;
-      font-size: 1.3rem;
+      margin: 15px 0 8px;
+      font-size: 1.2rem;
     }
     .btn {
       display: inline-flex;
@@ -137,13 +144,13 @@
       gap: 8px;
       background: var(--primary);
       color: white;
-      padding: 12px 25px;
+      padding: 10px 20px;
       border-radius: 25px;
       text-decoration: none;
       font-weight: bold;
       transition: all 0.3s;
-      font-size: 1.1rem;
-      margin: 10px 5px;
+      font-size: 1rem;
+      margin: 8px 5px;
     }
     .btn:hover {
       background: var(--primary-dark);
@@ -161,12 +168,12 @@
     .btn-login-signup {
       background: var(--primary);
       color: white;
-      padding: 18px 40px;
-      font-size: 1.4rem;
+      padding: 15px 30px;
+      font-size: 1.2rem;
       font-weight: bold;
       border-radius: 30px;
       text-transform: uppercase;
-      margin: 20px auto;
+      margin: 15px auto;
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -181,21 +188,21 @@
       background: rgba(31, 31, 31, 0.7);
       border: 1px solid var(--primary-light);
       border-radius: 12px;
-      padding: 20px;
-      margin: 20px auto;
-      max-width: 400px;
+      padding: 15px;
+      margin: 15px auto;
+      max-width: 350px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     }
     .features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 25px;
-      margin: 30px 0;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin: 25px 0;
     }
     .feature-card {
       background-color: rgba(31, 31, 31, 0.7);
       border-radius: 10px;
-      padding: 25px;
+      padding: 20px;
       border: 1px solid var(--border);
       transition: transform 0.3s;
     }
@@ -204,33 +211,33 @@
       border-color: var(--primary-light);
     }
     .feature-icon {
-      font-size: 2rem;
+      font-size: 1.8rem;
       color: var(--primary);
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       display: flex;
       justify-content: center;
     }
     .testimonials {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
+      grid-template-columns: 1fr;
+      gap: 15px;
+      margin-top: 25px;
     }
     .testimonial {
       background-color: rgba(31, 31, 31, 0.7);
-      padding: 20px;
+      padding: 15px;
       border-radius: 8px;
       border-left: 3px solid var(--primary);
     }
     .testimonial-author {
       display: flex;
       align-items: center;
-      margin-top: 15px;
-      gap: 10px;
+      margin-top: 12px;
+      gap: 8px;
     }
     .author-avatar {
-      width: 40px;
-      height: 40px;
+      width: 35px;
+      height: 35px;
       border-radius: 50%;
       background-color: var(--primary);
       display: flex;
@@ -241,49 +248,50 @@
     }
     .stats {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
       text-align: center;
-      margin: 40px 0;
+      margin: 30px 0;
     }
     .stat-item {
-      padding: 20px;
+      padding: 15px;
     }
     .stat-number {
-      font-size: 2.5rem;
+      font-size: 1.8rem;
       font-weight: bold;
       color: var(--primary);
       margin-bottom: 5px;
     }
     .stat-label {
       color: var(--text-light);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
     .cta-section {
       text-align: center;
-      padding: 50px 20px;
+      padding: 40px 15px;
       background: linear-gradient(135deg, rgba(29, 185, 84, 0.15) 0%, transparent 100%);
       border-radius: 12px;
-      margin: 50px 0;
+      margin: 40px 0;
     }
     .footer {
       background-color: var(--secondary);
-      padding: 40px 5%;
+      padding: 30px 5%;
       text-align: center;
-      margin-top: 50px;
+      margin-top: 40px;
       border-top: 1px solid var(--border);
     }
     .footer-links {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 20px;
-      margin: 20px 0;
+      gap: 15px;
+      margin: 15px 0;
     }
     .footer-links a {
       color: var(--text-light);
       text-decoration: none;
       transition: color 0.3s;
+      font-size: 0.9rem;
     }
     .footer-links a:hover {
       color: var(--primary);
@@ -291,47 +299,118 @@
     .social-links {
       display: flex;
       justify-content: center;
-      gap: 20px;
-      margin: 20px 0;
+      gap: 15px;
+      margin: 15px 0;
     }
     .social-links a {
       color: var(--text-light);
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       transition: color 0.3s;
     }
     .social-links a:hover {
       color: var(--primary);
     }
-    @media (max-width: 900px) {
+    .copyright {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    /* Mobile menu toggle */
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .menu-toggle:hover {
+      color: var(--primary);
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: row;
+        padding: 12px 4%;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
       .nav-links {
-        gap: 15px;
-        font-size: 0.95rem;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background-color: var(--secondary);
+        flex-direction: column;
+        align-items: center;
+        padding: 15px 0;
+        gap: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        transform: translateY(-150%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 99;
+      }
+      
+      .nav-links.active {
+        transform: translateY(0);
       }
       
       .nav-links a {
-        padding: 8px 12px;
+        width: 90%;
+        justify-content: center;
+        padding: 12px;
+      }
+      
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+      
+      .btn-login-signup {
+        padding: 12px 25px;
+        font-size: 1.1rem;
       }
     }
-    @media (max-width: 600px) {
-      .header {
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px 3%;
+
+    @media (min-width: 600px) {
+      .features {
+        grid-template-columns: repeat(2, 1fr);
       }
-      
-      .nav-links {
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 10px;
+      .testimonials {
+        grid-template-columns: repeat(2, 1fr);
       }
-      
+    }
+
+    @media (min-width: 900px) {
+      .features {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .testimonials {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .stats {
+        grid-template-columns: repeat(4, 1fr);
+      }
       .logo h1 {
-        font-size: 1.6rem;
+        font-size: 2rem;
       }
-      
       .logo i {
-        font-size: 1.6rem;
+        font-size: 2rem;
+      }
+      .nav-links {
+        gap: 15px;
+      }
+      .nav-links a {
+        font-size: 1rem;
+        padding: 10px 15px;
+      }
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+      .hero p {
+        font-size: 1.2rem;
       }
     }
   </style>
@@ -342,7 +421,10 @@
       <i class="fas fa-monkey"></i>
       <h1>Prompt Monkeys</h1>
     </div>
-    <nav class="nav-links">
+    <button class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+    <nav class="nav-links" id="navLinks">
       <a href="index.html" class="active"><i class="fas fa-home"></i> Home</a>
       <a href="login.html"><i class="fas fa-comments"></i> Chat</a>
       <a href="earnings.html"><i class="fas fa-chart-line"></i> Earnings</a>
@@ -463,7 +545,7 @@
 
     <section class="cta-section">
       <h2>Ready to Join the Conversation?</h2>
-      <p style="max-width: 600px; margin: 0 auto 30px;">Become part of the most engaged financial community online. Free to join, priceless insights.</p>
+      <p style="max-width: 600px; margin: 0 auto 25px; padding: 0 15px;">Become part of the most engaged financial community online. Free to join, priceless insights.</p>
       <a href="signup.html" class="btn"><i class="fas fa-user-plus"></i> Sign Up Now</a>
     </section>
   </main>
@@ -489,5 +571,34 @@
     </div>
     <p class="copyright">© 2025 Prompt Monkeys. All rights reserved.</p>
   </footer>
+
+  <script>
+    // Mobile menu toggle functionality
+    const menuToggle = document.getElementById('menuToggle');
+    const navLinks = document.getElementById('navLinks');
+    
+    menuToggle.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      
+      // Change icon based on menu state
+      const icon = menuToggle.querySelector('i');
+      if (navLinks.classList.contains('active')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+      } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      }
+    });
+    
+    // Close menu when a link is clicked
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('active');
+        menuToggle.querySelector('i').classList.remove('fa-times');
+        menuToggle.querySelector('i').classList.add('fa-bars');
+      });
+    });
+  </script>
 </body>
 </html>
