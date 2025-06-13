@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Prompt Monkeys</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <style>
+        :root {
+            --primary: #1DB954;
+            --primary-dark: #1AA34A;
+            --background: #121212;
+            --card-bg: rgba(31, 31, 31, 0.85);
+            --text: #FFFFFF;
+            --text-light: #B3B3B3;
+            --error: #FF4D4D;
+            --gradient: linear-gradient(135deg, #121212 0%, #1a3c1a 100%);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: var(--gradient);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            animation: fadeIn 1s ease-out;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+            transition: transform 0.3s;
+        }
+        .logo i:hover {
+            transform: rotate(10deg);
+        }
+        .logo h1 {
+            font-size: 1.75rem;
+            color: var(--text);
+            font-weight: 600;
+        }
+        .logout-btn {
+            background: var(--error);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .logout-btn:hover {
+            background: #cc0000;
+        }
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 40rem;
+            margin: auto;
+            box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: slideUp 0.8s ease-out;
+        }
+        h2 {
+            color: var(--primary);
+            font-size: 1.75rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        label {
+            display: block;
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--text-light);
+            border-radius: 0.5rem;
+            background: rgba(42, 42, 42, 0.9);
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 8rem;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0.5rem rgba(29, 185, 84, 0.3);
+        }
+        .error-message {
+            color: var(--error);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        button {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--primary);
+            border: none;
+            border-radius: 0.5rem;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-0.125rem);
+        }
+        button:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+        }
+        .notification {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            padding: 0.9375rem 1.25rem;
+            border-radius: 0.5rem;
+            color: var(--text);
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .notification.success {
+            background: var(--primary);
+        }
+        .notification.error {
+            background: var(--error);
+        }
+        .footer {
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 0.5rem;
+            transition: color 0.3s;
+        }
+        .footer a:hover {
+            color: var(--primary-dark);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(2rem); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @media (max-width: 30rem) {
+            .container {
+                padding: 1.5rem;
+                max-width: 90%;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+            .logo i {
+                font-size: 1.75rem;
+            }
+            input, textarea, button {
+                font-size: 0.875rem;
+            }
+        }
+        @media (min-width: 48rem) {
+            .container {
+                max-width: 48rem;
+            }
+            h2 {
+                font-size: 2rem;
+            }
+            .logo h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-monkey"></i>
+            <h1>Prompt Monkeys</h1>
+        </div>
+        <button class="logout-btn" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </header>
+
+    <div class="notification" id="notification"></div>
+    <div class="container">
+        <h2><i class="fas fa-pen"></i> Create Post</h2>
+        <form id="postForm">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" placeholder="Enter post title" required>
+                <div class="error-message" id="title-error">Title is required</div>
+            </div>
+            <div class="form-group">
+                <label for="content">Content</label>
+                <textarea id="content" placeholder="Enter post content" required></textarea>
+                <div class="error-message" id="content-error">Content is required</div>
+            </div>
+            <button type="submit" id="submitButton"><i class="fas fa-paper-plane"></i> Submit Post</button>
+        </form>
+    </div>
+
+    <footer class="footer">
+        <p>© 2025 Prompt Monkeys. All rights reserved.</p>
+        <p>
+            <a href="https://x.com/your-profile"><i class="fab fa-twitter"></i></a>
+            <a href="https://discord.com/your-server"><i class="fab fa-discord"></i></a>
+            <a href="https://linkedin.com/your-profile"><i class="fab fa-linkedin"></i></a>
+        </p>
+    </footer>
+
+    <script>
+        const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+        let supabase = null;
+
+        try {
+            supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+            console.log('Supabase initialized successfully');
+        } catch (error) {
+            showNotification('Failed to initialize Supabase: Invalid API key or configuration', true);
+            console.error('Supabase init error:', error);
+        }
+
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.toggle('error', isError);
+            notification.classList.toggle('success', !isError);
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!supabase) {
+                showNotification('Supabase client not initialized', true);
+                console.error('Supabase client not initialized');
+                return;
+            }
+
+            // Verify admin status
+            try {
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) {
+                    showNotification('Session expired. Please log in again.', true);
+                    setTimeout(() => window.location.assign('./admin-login.html'), 1000);
+                    return;
+                }
+
+                const { data: userData, error: userError } = await supabase
+                    .from('auth.users')
+                    .select('id, is_super_admin')
+                    .eq('id', user.id)
+                    .single();
+                if (userError || !userData || !userData.is_super_admin) {
+                    await supabase.auth.signOut();
+                    showNotification('Not authorized as admin.', true);
+                    setTimeout(() => window.location.assign('./admin-login.html'), 1000);
+                    return;
+                }
+                console.log('Admin verified, is_super_admin:', userData.is_super_admin);
+            } catch (error) {
+                showNotification('Error verifying admin status: ' + error.message, true);
+                console.error('Admin verification error:', error);
+                setTimeout(() => window.location.assign('./admin-login.html'), 1000);
+                return;
+            }
+
+            const postForm = document.getElementById('postForm');
+            const submitButton = document.getElementById('submitButton');
+            const logoutButton = document.getElementById('logoutButton');
+
+            logoutButton.addEventListener('click', async () => {
+                try {
+                    await supabase.auth.signOut();
+                    showNotification('Logged out successfully!', false);
+                    setTimeout(() => window.location.assign('./admin-login.html'), 1000);
+                } catch (error) {
+                    showNotification('Logout failed: ' + error.message, true);
+                    console.error('Logout error:', error);
+                }
+            });
+
+            postForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const title = document.getElementById('title').value.trim();
+                const content = document.getElementById('content').value.trim();
+                const titleError = document.getElementById('title-error');
+                const contentError = document.getElementById('content-error');
+
+                titleError.style.display = 'none';
+                contentError.style.display = 'none';
+
+                let isValid = true;
+                if (!title) {
+                    titleError.style.display = 'block';
+                    isValid = false;
+                }
+                if (!content) {
+                    contentError.style.display = 'block';
+                    isValid = false;
+                }
+
+                if (!isValid) return;
+
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
+
+                try {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    const { error } = await supabase
+                        .from('posts')
+                        .insert({ user_id: user.id, title, content });
+                    if (error) {
+                        throw new Error('Failed to create post: ' + error.message);
+                    }
+                    showNotification('Post created successfully!', false);
+                    console.log('Post created: ', { title, content });
+                    postForm.reset();
+                } catch (error) {
+                    showNotification(error.message || 'Post creation failed', true);
+                    console.error('Post error:', error);
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Post';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
