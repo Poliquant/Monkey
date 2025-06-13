@@ -322,30 +322,39 @@
                     }
                     console.log('Session data:', sessionData);
 
-                    // Check super admin status in profiles
-                    const { data: profileData, error: profileError } = await supabase
-                        .from('public.profiles')
-                        .select('id, is_super_admin')
-                        .eq('id', authData.user.id);
-                    console.log('Profile query result:', { profileData, profileError, userId: authData.user.id });
+                    // Check super admin status
+                    let isSuperAdmin = false;
+                    try {
+                        const { data: profileData, error: profileError } = await supabase
+                            .from('profiles')
+                            .select('id, is_super_admin')
+                            .eq('id', authData.user.id);
+                        console.log('Profile query result:', { profileData, profileError, userId: authData.user.id });
 
-                    if (profileError) {
-                        await supabase.auth.signOut();
-                        throw new Error(`Unable to verify admin status: ${profileError.message}`);
+                        if (profileError) {
+                            console.warn('Profile query error:', profileError.message);
+                        } else if (profileData && profileData.length > 0) {
+                            if (profileData.length > 1) {
+                                console.warn('Multiple profiles found:', profileData);
+                            }
+                            isSuperAdmin = profileData[0].is_super_admin;
+                            console.log('Profile found, is_super_admin:', isSuperAdmin);
+                        }
+                    } catch (profileErr) {
+                        console.warn('Profile check failed:', profileErr.message);
                     }
-                    if (!profileData || profileData.length === 0) {
-                        await supabase.auth.signOut();
-                        throw new Error('Unable to verify admin status: No profile found');
+
+                    // Fallback to user_metadata
+                    if (!isSuperAdmin) {
+                        const metadataSuperAdmin = authData.user.user_metadata.is_super_admin;
+                        isSuperAdmin = metadataSuperAdmin === true || metadataSuperAdmin === 'true';
+                        console.log('Fallback to user_metadata, is_super_admin:', isSuperAdmin, 'Raw metadata:', authData.user.user_metadata);
                     }
-                    if (profileData.length > 1) {
-                        console.warn('Multiple profiles found:', profileData);
-                    }
-                    const profile = profileData[0];
-                    if (!profile.is_super_admin) {
+
+                    if (!isSuperAdmin) {
                         await supabase.auth.signOut();
                         throw new Error('Access denied: Not a super admin');
                     }
-                    console.log('Super admin verified, is_super_admin:', profile.is_super_admin);
 
                     showNotification('Login successful!');
                     console.log('Redirecting to admin-portal.html');
