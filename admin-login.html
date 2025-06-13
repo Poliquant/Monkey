@@ -313,14 +313,21 @@
                     if (authError) {
                         throw new Error(`Invalid credentials: ${authError.message}`);
                     }
-                    console.log('Login successful, user ID:', authData.user.id);
+                    console.log('Login successful, user ID:', authData.user.id, 'Email:', authData.user.email);
+
+                    // Verify auth session
+                    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+                    if (sessionError) {
+                        console.error('Session error:', sessionError.message);
+                    }
+                    console.log('Session data:', sessionData);
 
                     // Check super admin status in profiles
                     const { data: profileData, error: profileError } = await supabase
-                        .from('profiles')
+                        .from('public.profiles')
                         .select('id, is_super_admin')
                         .eq('id', authData.user.id);
-                    console.log('Profile query result:', { profileData, profileError });
+                    console.log('Profile query result:', { profileData, profileError, userId: authData.user.id });
 
                     if (profileError) {
                         await supabase.auth.signOut();
@@ -333,7 +340,7 @@
                     if (profileData.length > 1) {
                         console.warn('Multiple profiles found:', profileData);
                     }
-                    const profile = profileData[0]; // Take first profile
+                    const profile = profileData[0];
                     if (!profile.is_super_admin) {
                         await supabase.auth.signOut();
                         throw new Error('Access denied: Not a super admin');
