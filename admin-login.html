@@ -254,8 +254,8 @@
             supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
             console.log('Supabase initialized successfully');
         } catch (error) {
-            showNotification('Failed to initialize Supabase: Invalid API key or configuration', true);
-            console.error('Supabase init error:', error);
+            showNotification('Failed to initialize Supabase: Check API key or URL', true);
+            console.error('Supabase init error:', error.message, error.stack);
         }
 
         function showNotification(message, isError = false) {
@@ -305,35 +305,31 @@
 
                 try {
                     console.log('Attempting login for:', email);
-                    // Sign in with Supabase Auth
+                    // Authenticate user
                     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                         email,
                         password
                     });
                     if (authError) {
-                        throw new Error(`Authentication failed: ${authError.message}`);
+                        throw new Error(`Login failed: ${authError.message}`);
                     }
-                    console.log('Authentication successful, user ID:', authData.user.id);
+                    console.log('Login successful, user ID:', authData.user.id);
 
-                    // Check if user is super admin
-                    const { data: userData, error: userError } = await supabase
-                        .from('auth.users')
+                    // Check super admin status
+                    const { data: profileData, error: profileError } = await supabase
+                        .from('profiles')
                         .select('id, is_super_admin')
                         .eq('id', authData.user.id)
                         .single();
-                    if (userError) {
+                    if (profileError || !profileData) {
                         await supabase.auth.signOut();
-                        throw new Error(`Failed to fetch user data: ${userError.message}`);
+                        throw new Error('Profile not found');
                     }
-                    if (!userData) {
+                    if (!profileData.is_super_admin) {
                         await supabase.auth.signOut();
-                        throw new Error('User not found');
+                        throw new Error('Access denied: Not a super admin');
                     }
-                    if (!userData.is_super_admin) {
-                        await supabase.auth.signOut();
-                        throw new Error('Not an admin');
-                    }
-                    console.log('Admin verified, is_super_admin:', userData.is_super_admin);
+                    console.log('Super admin verified, is_super_admin:', profileData.is_super_admin);
 
                     showNotification('Login successful!');
                     console.log('Redirecting to admin-portal.html');
@@ -343,7 +339,7 @@
                     }, 1000);
                 } catch (error) {
                     showNotification(error.message || 'Login failed', true);
-                    console.error('Login error:', error);
+                    console.error('Login error:', error.message, error.stack);
                 } finally {
                     loginButton.disabled = false;
                     loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
