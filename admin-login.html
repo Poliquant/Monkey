@@ -252,10 +252,10 @@
 
         try {
             supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+            console.log('Supabase initialized successfully');
         } catch (error) {
             showNotification('Failed to initialize Supabase: Invalid API key or configuration', true);
             console.error('Supabase init error:', error);
-            // Skip further execution without 'return'
         }
 
         function showNotification(message, isError = false) {
@@ -273,6 +273,7 @@
 
             if (!supabase) {
                 showNotification('Supabase client not initialized', true);
+                console.error('Supabase client not initialized');
                 return;
             }
 
@@ -303,6 +304,7 @@
                 loginButton.textContent = 'Logging in...';
 
                 try {
+                    console.log('Attempting login for:', email);
                     // Sign in with Supabase Auth
                     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                         email,
@@ -311,10 +313,11 @@
                     if (authError) {
                         throw new Error(`Authentication failed: ${authError.message}`);
                     }
+                    console.log('Authentication successful, user ID:', authData.user.id);
 
                     // Check if user is super admin
                     const { data: userData, error: userError } = await supabase
-                        .from('users')
+                        .from('auth.users')
                         .select('id, is_super_admin')
                         .eq('id', authData.user.id)
                         .single();
@@ -330,9 +333,14 @@
                         await supabase.auth.signOut();
                         throw new Error('Not an admin');
                     }
+                    console.log('Admin verified, is_super_admin:', userData.is_super_admin);
 
                     showNotification('Login successful!');
-                    setTimeout(() => window.location.href = 'admin-portal.html', 1000);
+                    console.log('Redirecting to admin-portal.html');
+                    setTimeout(() => {
+                        window.location.assign('./admin-portal.html');
+                        console.log('Redirect executed');
+                    }, 1000);
                 } catch (error) {
                     showNotification(error.message || 'Login failed', true);
                     console.error('Login error:', error);
