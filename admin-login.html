@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Prompt Monkeys</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
         :root {
             --primary: #1DB954;
@@ -245,18 +244,8 @@
         </p>
     </footer>
 
-    <script>
-        const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
-        let supabase = null;
-
-        try {
-            supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-            console.log('Supabase initialized successfully');
-        } catch (error) {
-            showNotification('Failed to initialize Supabase: Check API key or URL', true);
-            console.error('Supabase init error:', error.message, error.stack);
-        }
+    <script type="module">
+        import { handleLogin } from './admin-login.js';
 
         function showNotification(message, isError = false) {
             const notification = document.getElementById('notification');
@@ -270,12 +259,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             const loginForm = document.getElementById('loginForm');
             const loginButton = document.getElementById('loginButton');
-
-            if (!supabase) {
-                showNotification('Supabase client not initialized', true);
-                console.error('Supabase client not initialized');
-                return;
-            }
 
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -304,64 +287,8 @@
                 loginButton.textContent = 'Logging in...';
 
                 try {
-                    console.log('Attempting login for:', email);
-                    // Simple login
-                    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-                        email,
-                        password
-                    });
-                    if (authError) {
-                        throw new Error(`Invalid credentials: ${authError.message}`);
-                    }
-                    console.log('Login successful, user ID:', authData.user.id, 'Email:', authData.user.email);
-
-                    // Verify auth session
-                    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-                    if (sessionError) {
-                        console.error('Session error:', sessionError.message);
-                    }
-                    console.log('Session data:', sessionData);
-
-                    // Check super admin status
-                    let isSuperAdmin = false;
-                    try {
-                        const { data: profileData, error: profileError } = await supabase
-                            .from('profiles')
-                            .select('id, is_super_admin')
-                            .eq('id', authData.user.id);
-                        console.log('Profile query result:', { profileData, profileError, userId: authData.user.id });
-
-                        if (profileError) {
-                            console.warn('Profile query error:', profileError.message);
-                        } else if (profileData && profileData.length > 0) {
-                            if (profileData.length > 1) {
-                                console.warn('Multiple profiles found:', profileData);
-                            }
-                            isSuperAdmin = profileData[0].is_super_admin;
-                            console.log('Profile found, is_super_admin:', isSuperAdmin);
-                        }
-                    } catch (profileErr) {
-                        console.warn('Profile check failed:', profileErr.message);
-                    }
-
-                    // Fallback to user_metadata
-                    if (!isSuperAdmin) {
-                        const metadataSuperAdmin = authData.user.user_metadata.is_super_admin;
-                        isSuperAdmin = metadataSuperAdmin === true || metadataSuperAdmin === 'true';
-                        console.log('Fallback to user_metadata, is_super_admin:', isSuperAdmin, 'Raw metadata:', authData.user.user_metadata);
-                    }
-
-                    if (!isSuperAdmin) {
-                        await supabase.auth.signOut();
-                        throw new Error('Access denied: Not a super admin');
-                    }
-
+                    await handleLogin(email, password);
                     showNotification('Login successful!');
-                    console.log('Redirecting to admin-portal.html');
-                    setTimeout(() => {
-                        window.location.assign('./admin-portal.html');
-                        console.log('Redirect executed');
-                    }, 1000);
                 } catch (error) {
                     showNotification(error.message || 'Login failed', true);
                     console.error('Login error:', error.message, error.stack);
