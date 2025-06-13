@@ -305,31 +305,42 @@
 
                 try {
                     console.log('Attempting login for:', email);
-                    // Authenticate user
+                    // Simple login
                     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                         email,
                         password
                     });
                     if (authError) {
-                        throw new Error(`Login failed: ${authError.message}`);
+                        throw new Error(`Invalid credentials: ${authError.message}`);
                     }
                     console.log('Login successful, user ID:', authData.user.id);
 
                     // Check super admin status
-                    const { data: profileData, error: profileError } = await supabase
-                        .from('profiles')
-                        .select('id, is_super_admin')
-                        .eq('id', authData.user.id)
-                        .single();
-                    if (profileError || !profileData) {
+                    try {
+                        const { data: profileData, error: profileError } = await supabase
+                            .from('profiles')
+                            .select('id, is_super_admin')
+                            .eq('id', authData.user.id)
+                            .single();
+                        if (profileError) {
+                            console.error('Profile query error:', profileError.message);
+                            await supabase.auth.signOut();
+                            throw new Error('Unable to verify admin status');
+                        }
+                        if (!profileData) {
+                            await supabase.auth.signOut();
+                            throw new Error('Profile not found');
+                        }
+                        if (!profileData.is_super_admin) {
+                            await supabase.auth.signOut();
+                            throw new Error('Access denied: Not a super admin');
+                        }
+                        console.log('Super admin verified, is_super_admin:', profileData.is_super_admin);
+                    } catch (profileErr) {
+                        console.error('Admin check failed:', profileErr.message);
                         await supabase.auth.signOut();
-                        throw new Error('Profile not found');
+                        throw profileErr;
                     }
-                    if (!profileData.is_super_admin) {
-                        await supabase.auth.signOut();
-                        throw new Error('Access denied: Not a super admin');
-                    }
-                    console.log('Super admin verified, is_super_admin:', profileData.is_super_admin);
 
                     showNotification('Login successful!');
                     console.log('Redirecting to admin-portal.html');
