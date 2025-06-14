@@ -280,7 +280,6 @@
                     throw new Error(`Invalid credentials: ${authError.message}`);
                 }
                 console.log('Login successful, user ID:', authData.user.id, 'Email:', authData.user.email);
-
                 await checkSuperadminStatus(authData.user);
                 return true;
             } catch (error) {
@@ -290,43 +289,49 @@
         }
 
         async function checkSuperadminStatus(user) {
-            console.log('checkSuperadminStatus called for user:', user.email);
-            if (user) {
-                let isSuperAdmin = false;
-                try {
-                    const { data, error } = await supabase
-                        .from('auth.users')
-                        .select('is_super_admin')
-                        .eq('email', user.email)
-                        .single();
-                    console.log('User query result:', { data, error, userEmail: user.email });
+            console.log('checkSuperadminStatus called for user:', user?.email || 'No user');
+            if (!user) {
+                console.log('No user, staying on admin-login.html');
+                showNotification('No user found', true);
+                return;
+            }
 
-                    if (error) {
-                        console.warn('Error fetching user data:', error.message);
-                    } else if (data) {
-                        isSuperAdmin = data.is_super_admin === true || data.is_super_admin === 'true';
-                        console.log('User data found, is_super_admin:', isSuperAdmin);
-                    }
-                } catch (queryError) {
-                    console.warn('User query failed:', queryError.message);
+            let isSuperAdmin = false;
+            try {
+                const { data, error } = await supabase
+                    .from('auth.users')
+                    .select('is_super_admin')
+                    .eq('email', user.email)
+                    .single();
+                console.log('User query result:', { data, error, userEmail: user.email });
+
+                if (error) {
+                    console.warn('Error fetching user data:', error.message);
+                } else if (data) {
+                    isSuperAdmin = data.is_super_admin === true || data.is_super_admin === 'true';
+                    console.log('User data found, is_super_admin:', isSuperAdmin);
                 }
+            } catch (queryError) {
+                console.warn('User query failed:', queryError.message);
+            }
 
-                if (!isSuperAdmin) {
-                    const metadataSuperAdmin = user.user_metadata.is_super_admin;
-                    isSuperAdmin = metadataSuperAdmin === true || metadataSuperAdmin === 'true';
-                    console.log('Fallback to user_metadata, is_super_admin:', isSuperAdmin, 'Raw metadata:', user.user_metadata);
-                }
+            if (!isSuperAdmin) {
+                const metadataSuperAdmin = user.user_metadata.is_super_admin;
+                isSuperAdmin = metadataSuperAdmin === true || metadataSuperAdmin === 'true';
+                console.log('Fallback to user_metadata, is_super_admin:', isSuperAdmin, 'Raw metadata:', user.user_metadata);
+            }
 
-                if (isSuperAdmin) {
-                    console.log('Redirecting to admin-portal.html');
+            if (isSuperAdmin) {
+                console.log('Super admin confirmed, redirecting to admin-portal.html');
+                showNotification('Login successful!');
+                setTimeout(() => {
                     window.location.assign('./admin-portal.html');
-                } else {
-                    console.log('Redirecting to chat.html');
-                    window.location.assign('./chat.html');
-                }
+                    console.log('Redirect executed');
+                }, 1000);
             } else {
-                console.log('No user, redirecting to admin-login.html');
-                window.location.assign('./admin-login.html');
+                console.log('Not a super admin, signing out');
+                await supabase.auth.signOut();
+                showNotification('Access denied: Not a super admin', true);
             }
         }
 
@@ -337,6 +342,13 @@
 
             if (!loginForm) {
                 console.error('Login form not found');
+                showNotification('Form not found', true);
+                return;
+            }
+
+            if (!supabase) {
+                console.error('Supabase not initialized');
+                showNotification('Supabase not initialized', true);
                 return;
             }
 
@@ -373,7 +385,6 @@
 
                 try {
                     await handleLogin(email, password);
-                    showNotification('Login successful!');
                 } catch (error) {
                     showNotification(error.message || 'Login failed', true);
                 } finally {
@@ -384,4 +395,4 @@
         });
     </script>
 </body>
-</html=]
+</html>
