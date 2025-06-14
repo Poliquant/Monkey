@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Prompt Monkeys</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
         :root {
             --primary: #1DB954;
@@ -244,10 +245,21 @@
         </p>
     </footer>
 
-    <script type="module">
-        import { handleLogin } from './admin-login.js';
+    <script>
+        const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+        let supabase = null;
+
+        try {
+            supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+            console.log('Supabase initialized successfully');
+        } catch (error) {
+            showNotification('Failed to initialize Supabase', true);
+            console.error('Supabase init error:', error.message);
+        }
 
         function showNotification(message, isError = false) {
+            console.log('Notification:', message, 'Error:', isError);
             const notification = document.getElementById('notification');
             notification.textContent = message;
             notification.classList.toggle('error', isError);
@@ -256,11 +268,80 @@
             setTimeout(() => notification.classList.remove('show'), 3000);
         }
 
+        async function handleLogin(email, password) {
+            console.log('handleLogin called with email:', email);
+            try {
+                console.log('Attempting Supabase login');
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                if (authError) {
+                    throw new Error(`Invalid credentials: ${authError.message}`);
+                }
+                console.log('Login successful, user ID:', authData.user.id, 'Email:', authData.user.email);
+
+                await checkSuperadminStatus(authData.user);
+                return true;
+            } catch (error) {
+                console.error('Login error:', error.message);
+                throw error;
+            }
+        }
+
+        async function checkSuperadminStatus(user) {
+            console.log('checkSuperadminStatus called for user:', user.email);
+            if (user) {
+                let isSuperAdmin = false;
+                try {
+                    const { data, error } = await supabase
+                        .from('auth.users')
+                        .select('is_super_admin')
+                        .eq('email', user.email)
+                        .single();
+                    console.log('User query result:', { data, error, userEmail: user.email });
+
+                    if (error) {
+                        console.warn('Error fetching user data:', error.message);
+                    } else if (data) {
+                        isSuperAdmin = data.is_super_admin === true || data.is_super_admin === 'true';
+                        console.log('User data found, is_super_admin:', isSuperAdmin);
+                    }
+                } catch (queryError) {
+                    console.warn('User query failed:', queryError.message);
+                }
+
+                if (!isSuperAdmin) {
+                    const metadataSuperAdmin = user.user_metadata.is_super_admin;
+                    isSuperAdmin = metadataSuperAdmin === true || metadataSuperAdmin === 'true';
+                    console.log('Fallback to user_metadata, is_super_admin:', isSuperAdmin, 'Raw metadata:', user.user_metadata);
+                }
+
+                if (isSuperAdmin) {
+                    console.log('Redirecting to admin-portal.html');
+                    window.location.assign('./admin-portal.html');
+                } else {
+                    console.log('Redirecting to chat.html');
+                    window.location.assign('./chat.html');
+                }
+            } else {
+                console.log('No user, redirecting to admin-login.html');
+                window.location.assign('./admin-login.html');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, setting up login form');
             const loginForm = document.getElementById('loginForm');
             const loginButton = document.getElementById('loginButton');
 
+            if (!loginForm) {
+                console.error('Login form not found');
+                return;
+            }
+
             loginForm.addEventListener('submit', async (e) => {
+                console.log('Form submit event triggered');
                 e.preventDefault();
 
                 const email = document.getElementById('email').value.trim();
@@ -281,17 +362,20 @@
                     isValid = false;
                 }
 
-                if (!isValid) return;
+                if (!isValid) {
+                    console.log('Form validation failed');
+                    return;
+                }
 
                 loginButton.disabled = true;
                 loginButton.textContent = 'Logging in...';
+                console.log('Form validated, calling handleLogin');
 
                 try {
                     await handleLogin(email, password);
                     showNotification('Login successful!');
                 } catch (error) {
                     showNotification(error.message || 'Login failed', true);
-                    console.error('Login error:', error.message, error.stack);
                 } finally {
                     loginButton.disabled = false;
                     loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
@@ -300,4 +384,4 @@
         });
     </script>
 </body>
-</html>
+</html=]
