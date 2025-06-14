@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Prompt Monkeys</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="console.log('Font Awesome loaded')" onerror="console.error('Failed to load Font Awesome')">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" onload="console.log('Supabase JS loaded')" onerror="console.error('Failed to load Supabase JS')"></script>
     <style>
         :root {
             --primary: #1DB954;
@@ -281,11 +281,13 @@
             }
             console.log('handleLogin called with email:', email);
             try {
+                console.log('Attempting login with Supabase');
                 const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                     email,
                     password
                 });
                 if (authError) {
+                    console.error('Authentication error:', authError);
                     throw new Error(`Invalid credentials: ${authError.message}`);
                 }
                 console.log('Login successful, user ID:', authData.user.id, 'Email:', authData.user.email);
@@ -306,12 +308,12 @@
             const metadata = user.user_metadata || {};
             const metadataSuperAdmin = metadata.is_super_admin;
             const isSuperAdmin = metadataSuperAdmin === true || 
-                                metadataSuperAdmin === 'true' || 
-                                metadataSuperAdmin === 'True';
+                                String(metadataSuperAdmin).toLowerCase() === 'true';
             console.log('Checking user_metadata:', {
                 is_super_admin: isSuperAdmin,
-                raw_metadata: metadata,
-                metadata_super_admin: metadataSuperAdmin
+                raw_metadata: JSON.stringify(metadata, null, 2),
+                metadata_super_admin: metadataSuperAdmin,
+                metadata_type: typeof metadataSuperAdmin
             });
 
             if (isSuperAdmin) {
@@ -319,7 +321,12 @@
                 return true;
             } else {
                 console.log(`${user.email} is not an admin.`);
-                await supabase.auth.signOut();
+                try {
+                    await supabase.auth.signOut();
+                    console.log('User signed out');
+                } catch (signOutError) {
+                    console.error('Sign out error:', signOutError);
+                }
                 throw new Error('Access denied: Not a super admin');
             }
         }
@@ -378,11 +385,12 @@
                     if (isAdmin) {
                         showNotification('Login successful!');
                         setTimeout(() => {
-                            console.log('Redirecting to admin-portal.html');
+                            console.log('Attempting redirect to /Monkey/admin-portal.html');
                             window.location.assign('/Monkey/admin-portal.html');
                         }, 1000);
                     }
                 } catch (error) {
+                    console.error('Login attempt error:', error);
                     showNotification(error.message || 'Login failed', true);
                 } finally {
                     loginButton.disabled = false;
