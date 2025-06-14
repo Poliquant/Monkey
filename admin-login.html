@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Prompt Monkeys</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
         :root {
             --primary: #1DB954;
@@ -244,12 +245,28 @@
         </p>
     </footer>
 
-    <script type="module">
-        import { handleLogin } from './admin-login.js';
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+        let supabase = null;
 
+        try {
+            supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+            console.log('Supabase initialized successfully');
+        } catch (error) {
+            showNotification('Failed to initialize Supabase client', true);
+            console.error('Supabase init error:', error.message);
+        }
+
+        // Show notification
         function showNotification(message, isError = false) {
             console.log('Notification:', message, 'Error:', isError);
             const notification = document.getElementById('notification');
+            if (!notification) {
+                console.error('Notification element not found');
+                return;
+            }
             notification.textContent = message;
             notification.classList.toggle('error', isError);
             notification.classList.toggle('success', !isError);
@@ -257,6 +274,57 @@
             setTimeout(() => notification.classList.remove('show'), 3000);
         }
 
+        // Handle login and admin check
+        async function handleLogin(email, password) {
+            if (!supabase) {
+                throw new Error('Supabase client not initialized');
+            }
+            console.log('handleLogin called with email:', email);
+            try {
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                if (authError) {
+                    throw new Error(`Invalid credentials: ${authError.message}`);
+                }
+                console.log('Login successful, user ID:', authData.user.id, 'Email:', authData.user.email);
+                return await checkAdminStatus(authData.user);
+            } catch (error) {
+                console.error('Login error:', error.message);
+                throw error;
+            }
+        }
+
+        // Check admin status using user_metadata
+        async function checkAdminStatus(user) {
+            if (!user) {
+                console.log('No user logged in');
+                throw new Error('No user logged in');
+            }
+
+            const metadata = user.user_metadata || {};
+            const metadataSuperAdmin = metadata.is_super_admin;
+            const isSuperAdmin = metadataSuperAdmin === true || 
+                                metadataSuperAdmin === 'true' || 
+                                metadataSuperAdmin === 'True';
+            console.log('Checking user_metadata:', {
+                is_super_admin: isSuperAdmin,
+                raw_metadata: metadata,
+                metadata_super_admin: metadataSuperAdmin
+            });
+
+            if (isSuperAdmin) {
+                console.log(`${user.email} is an admin.`);
+                return true;
+            } else {
+                console.log(`${user.email} is not an admin.`);
+                await supabase.auth.signOut();
+                throw new Error('Access denied: Not a super admin');
+            }
+        }
+
+        // Setup form event listener
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM loaded, setting up login form');
             const loginForm = document.getElementById('loginForm');
@@ -265,6 +333,12 @@
             if (!loginForm) {
                 console.error('Login form not found');
                 showNotification('Form not found', true);
+                return;
+            }
+
+            if (!loginButton) {
+                console.error('Login button not found');
+                showNotification('Button not found', true);
                 return;
             }
 
@@ -305,7 +379,7 @@
                         showNotification('Login successful!');
                         setTimeout(() => {
                             console.log('Redirecting to admin-portal.html');
-                            window.location.assign('./admin-portal.html');
+                            window.location.assign('/Monkey/admin-portal.html');
                         }, 1000);
                     }
                 } catch (error) {
