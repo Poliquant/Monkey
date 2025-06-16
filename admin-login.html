@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Prompt Monkeys</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="console.log('Font Awesome loaded')" onerror="console.error('Failed to load Font Awesome')">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" onload="console.log('Supabase JS loaded')" onerror="console.error('Failed to load Supabase JS')"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
         :root {
             --primary: #1DB954;
@@ -248,30 +248,21 @@
     <script>
         // Initialize Supabase client
         const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
-        const supabaseAnonKey = 'YOUR_CORRECT_ANON_KEY'; // Replace with the anon key from chat.html or Supabase dashboard
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
         let supabase = null;
 
-        if (supabaseAnonKey === 'YOUR_CORRECT_ANON_KEY') {
-            console.error('Supabase anon key not set. Please replace YOUR_CORRECT_ANON_KEY with the key from chat.html or Supabase dashboard.');
-            showNotification('Configuration error: Invalid Supabase key. Check console for instructions.', true);
-        } else {
-            try {
-                supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-                console.log('Supabase initialized successfully');
-            } catch (error) {
-                showNotification('Failed to initialize Supabase client', true);
-                console.error('Supabase init error:', error.message);
-            }
+        try {
+            supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+            console.log('Supabase initialized successfully');
+        } catch (error) {
+            console.error('Supabase init error:', error.message);
+            showNotification('Failed to initialize Supabase client', true);
         }
 
         // Show notification
         function showNotification(message, isError = false) {
             console.log('Notification:', message, 'Error:', isError);
             const notification = document.getElementById('notification');
-            if (!notification) {
-                console.error('Notification element not found');
-                return;
-            }
             notification.textContent = message;
             notification.classList.toggle('error', isError);
             notification.classList.toggle('success', !isError);
@@ -284,83 +275,73 @@
             if (!supabase) {
                 throw new Error('Supabase client not initialized');
             }
-            console.log('handleLogin called with email:', email);
+            console.log('Attempting login for:', email);
             try {
-                console.log('Attempting login with Supabase');
                 const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
                     email,
                     password
                 });
                 if (authError) {
-                    console.error('Authentication error:', authError);
-                    throw new Error(`Invalid credentials: ${authError.message}`);
+                    console.error('Authentication error:', authError.message);
+                    throw new Error('Invalid email or password');
                 }
-                console.log('Login successful, user ID:', authData.user.id, 'Email:', authData.user.email);
-                return await checkAdminStatus(authData.user);
+                console.log('Login successful, user:', authData.user.email, 'ID:', authData.user.id);
+                return await checkSuperAdmin(authData.user);
             } catch (error) {
                 console.error('Login error:', error.message);
                 throw error;
             }
         }
 
-        // Check admin status using user_metadata
-        async function checkAdminStatus(user) {
+        // Check super admin status
+        async function checkSuperAdmin(user) {
             if (!user) {
-                console.log('No user logged in');
+                console.error('No user provided');
                 throw new Error('No user logged in');
             }
-
+            console.log('Checking super admin status for:', user.email);
             console.log('Full user object:', JSON.stringify(user, null, 2));
-            const metadata = user.user_metadata || {};
-            const metadataSuperAdmin = metadata.is_super_admin;
-            const isSuperAdmin = metadataSuperAdmin === true || 
-                                 String(metadataSuperAdmin).toLowerCase() === 'true' ||
-                                 metadataSuperAdmin === 'True' ||
-                                 metadataSuperAdmin === '1';
-            console.log('Checking user_metadata:', {
+
+            const rawMetadata = user.raw_user_meta_data || {};
+            const isSuperAdmin = rawMetadata.is_super_admin;
+            const isAdmin = String(isSuperAdmin).toLowerCase() === 'true';
+
+            console.log('Super admin check:', {
+                email: user.email,
+                raw_user_meta_data: JSON.stringify(rawMetadata, null, 2),
                 is_super_admin: isSuperAdmin,
-                raw_metadata: JSON.stringify(metadata, null, 2),
-                metadata_super_admin: metadataSuperAdmin,
-                metadata_type: typeof metadataSuperAdmin,
-                raw_user_meta_data: user.raw_user_meta_data || 'undefined'
+                is_admin: isAdmin
             });
 
-            if (isSuperAdmin) {
-                console.log(`${user.email} is an admin.`);
+            if (isAdmin) {
+                console.log(`${user.email} is a super admin`);
                 return true;
             } else {
-                console.log(`${user.email} is not an admin.`);
+                console.log(`${user.email} is not a super admin`);
                 try {
                     await supabase.auth.signOut();
-                    console.log('User signed out');
+                    console.log('Non-admin user signed out');
                 } catch (signOutError) {
-                    console.error('Sign out error:', signOutError);
+                    console.error('Sign out error:', signOutError.message);
                 }
                 throw new Error('Access denied: Not a super admin');
             }
         }
 
-        // Setup form event listener
+        // Form submission
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, setting up login form');
             const loginForm = document.getElementById('loginForm');
             const loginButton = document.getElementById('loginButton');
 
-            if (!loginForm) {
-                console.error('Login form not found');
-                showNotification('Form not found', true);
-                return;
-            }
-
-            if (!loginButton) {
-                console.error('Login button not found');
-                showNotification('Button not found', true);
+            if (!loginForm || !loginButton) {
+                console.error('Form or button not found');
+                showNotification('Form error', true);
                 return;
             }
 
             loginForm.addEventListener('submit', async (e) => {
-                console.log('Form submit event triggered');
                 e.preventDefault();
+                console.log('Form submitted');
 
                 const email = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value.trim();
@@ -370,37 +351,27 @@
                 emailError.style.display = 'none';
                 passwordError.style.display = 'none';
 
-                let isValid = true;
                 if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                     emailError.style.display = 'block';
-                    isValid = false;
+                    return;
                 }
                 if (!password) {
                     passwordError.style.display = 'block';
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    console.log('Form validation failed');
                     return;
                 }
 
                 loginButton.disabled = true;
                 loginButton.textContent = 'Logging in...';
-                console.log('Form validated, calling handleLogin');
 
                 try {
                     const isAdmin = await handleLogin(email, password);
                     if (isAdmin) {
-                        showNotification('Login successful!');
-                        setTimeout(() => {
-                            console.log('Attempting redirect to /Monkey/admin-portal.html');
-                            window.location.assign('/Monkey/admin-portal.html');
-                        }, 1000);
+                        showNotification('Login successful! Redirecting...');
+                        console.log('Redirecting to /Monkey/admin-portal.html');
+                        setTimeout(() => window.location.assign('/Monkey/admin-portal.html'), 1000);
                     }
                 } catch (error) {
-                    console.error('Login attempt error:', error);
-                    showNotification(error.message || 'Login failed', true);
+                    showNotification(error.message, true);
                 } finally {
                     loginButton.disabled = false;
                     loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
