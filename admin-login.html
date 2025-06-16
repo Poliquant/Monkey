@@ -248,7 +248,7 @@
     <script>
         // Initialize Supabase client
         const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8'; // Provided key, likely invalid; replace with correct key from chat.html or Supabase dashboard
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
         let supabase = null;
 
         try {
@@ -308,7 +308,7 @@
             const metadata = user.user_metadata || {};
             const metadataSuperAdmin = metadata.is_super_admin;
             const isSuperAdmin = metadataSuperAdmin === true || 
-                                 String(metadataSuperAdmin).toLowerCase() === 'true';
+                                String(metadataSuperAdmin).toLowerCase() === 'true';
             console.log('Checking user_metadata:', {
                 is_super_admin: isSuperAdmin,
                 raw_metadata: JSON.stringify(metadata, null, 2),
