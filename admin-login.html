@@ -280,7 +280,7 @@
             }, 3000);
         }
 
-        // Fixed handleLogin function using profiles table
+        // Fixed handleLogin function with robust profile handling
         async function handleLogin(email, password) {
             if (!supabase) {
                 throw new Error('Database connection not established');
@@ -299,35 +299,50 @@
                         : error.message);
                 }
 
-                // Query the profiles table for admin status
-                const { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('is_super_admin')
-                    .eq('id', user.id)
-                    .single();
+                // Check if user has admin privilege in auth.users
+                const isAuthAdmin = user.is_super_admin === true || 
+                                   String(user.is_super_admin).toLowerCase() === 'true';
 
-                if (profileError) {
-                    console.error('Profile query error:', profileError);
-                    throw new Error('Failed to retrieve admin status');
+                if (isAuthAdmin) {
+                    console.log('User is admin via auth.users table');
+                    return true;
                 }
 
-                // Robust admin check
-                const isAdmin = profile.is_super_admin === true || 
-                               String(profile.is_super_admin).toLowerCase() === 'true';
+                // Try to get admin status from profiles table if exists
+                try {
+                    const { data: profile, error: profileError } = await supabase
+                        .from('profiles')
+                        .select('is_super_admin')
+                        .eq('id', user.id)
+                        .single();
 
-                console.log('Admin check results:', {
-                    email: user.email,
-                    is_super_admin: profile.is_super_admin,
-                    type: typeof profile.is_super_admin,
-                    isAdmin: isAdmin
-                });
+                    if (!profileError && profile) {
+                        const isProfileAdmin = profile.is_super_admin === true || 
+                                              String(profile.is_super_admin).toLowerCase() === 'true';
 
-                if (!isAdmin) {
-                    await supabase.auth.signOut();
-                    throw new Error('Access denied: Administrator privileges required');
+                        if (isProfileAdmin) {
+                            console.log('User is admin via profiles table');
+                            return true;
+                        }
+                    }
+                } catch (profileError) {
+                    console.warn('Profiles table not accessible or user not found:', profileError.message);
+                    // Continue to next check
                 }
 
-                return true;
+                // Check raw_user_meta_data as fallback
+                const rawUserData = user.raw_user_meta_data || {};
+                const isMetaAdmin = rawUserData.is_super_admin === true || 
+                                    String(rawUserData.is_super_admin).toLowerCase() === 'true';
+
+                if (isMetaAdmin) {
+                    console.log('User is admin via raw_user_meta_data');
+                    return true;
+                }
+
+                // If no admin privilege found anywhere
+                await supabase.auth.signOut();
+                throw new Error('Access denied: Administrator privileges required');
             } catch (error) {
                 console.error('Login error:', error);
                 throw error;
