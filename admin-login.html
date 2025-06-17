@@ -280,7 +280,7 @@
             }, 3000);
         }
 
-        // Handle login and admin verification
+        // Fixed handleLogin function with robust admin check
         async function handleLogin(email, password) {
             if (!supabase) {
                 throw new Error('Database connection not established');
@@ -299,7 +299,7 @@
                         : error.message);
                 }
 
-                // Enhanced admin check to handle string and boolean values
+                // Robust admin check that handles all cases
                 const isAdmin = user.is_super_admin === true || 
                                user.is_super_admin === 'true' ||
                                (user.raw_user_meta_data && 
