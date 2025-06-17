@@ -280,13 +280,14 @@
             }, 3000);
         }
 
-        // Fixed handleLogin function with proper admin check
+        // Handle login and admin verification
         async function handleLogin(email, password) {
             if (!supabase) {
                 throw new Error('Database connection not established');
             }
             
             try {
+                // Authenticate user
                 const { data: { user, session }, error } = await supabase.auth.signInWithPassword({
                     email,
                     password
@@ -298,14 +299,17 @@
                         : error.message);
                 }
 
-                // Enhanced admin check that handles string 'true' or boolean true
+                // Enhanced admin check to handle string and boolean values
                 const isAdmin = user.is_super_admin === true || 
-                               String(user.is_super_admin).toLowerCase() === 'true';
+                               user.is_super_admin === 'true' ||
+                               (user.raw_user_meta_data && 
+                                (user.raw_user_meta_data.is_super_admin === true || 
+                                 user.raw_user_meta_data.is_super_admin === 'true'));
 
                 console.log('Admin check results:', {
                     email: user.email,
                     is_super_admin: user.is_super_admin,
-                    type: typeof user.is_super_admin,
+                    raw_user_meta_data: user.raw_user_meta_data,
                     isAdmin: isAdmin
                 });
 
