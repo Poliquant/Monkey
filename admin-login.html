@@ -3,174 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banana Portal | Prompt Monkeys Admin</title>
+    <title>Admin Login | Prompt Monkeys</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
         :root {
-            --banana: #FFE135;
-            --banana-dark: #F5D300;
-            --jungle: #1A3A27;
-            --vine: #5BBF4E;
-            --monkey-brown: #8B5A2B;
+            --primary: #1DB954;
+            --primary-dark: #1AA34A;
+            --primary-light: #4cd97f;
+            --background: #121212;
+            --card-bg: #1f1f1f;
             --text: #FFFFFF;
+            --text-light: #B3B3B3;
             --error: #FF4D4D;
+            --warning: #FFA726;
+            --border: #333;
+            --gradient: linear-gradient(135deg, #121212 0%, #1a3c1a 100%);
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Comic Neue', cursive, sans-serif;
-        }
-        
-        @keyframes swing {
-            0%, 100% { transform: rotate(-5deg); }
-            50% { transform: rotate(5deg); }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes leaf-shake {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(5deg); }
-            75% { transform: rotate(-5deg); }
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: radial-gradient(circle at center, var(--jungle), #0A1F14);
+            background: var(--gradient);
             color: var(--text);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             padding: 1rem;
-            overflow-x: hidden;
-        }
-        
-        .jungle-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.3;
-            background-image: 
-                radial-gradient(circle at 20% 30%, var(--vine) 2px, transparent 3px),
-                radial-gradient(circle at 80% 70%, var(--vine) 2px, transparent 3px);
-            background-size: 50px 50px;
+            line-height: 1.6;
         }
         
         .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            animation: fadeIn 1s ease-out;
-            margin-bottom: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.8s ease-out;
         }
         
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+            justify-content: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
         
         .logo i {
-            font-size: 3rem;
-            color: var(--banana);
-            animation: swing 3s ease-in-out infinite;
+            font-size: 2.5rem;
+            color: var(--primary);
+            animation: bounce 2s infinite;
         }
         
         .logo h1 {
-            font-size: 2.5rem;
-            color: var(--banana);
+            font-size: 2rem;
             font-weight: 700;
-            letter-spacing: 1px;
+            background: linear-gradient(to right, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
         
         .container {
-            background: rgba(26, 58, 39, 0.8);
+            background: var(--card-bg);
             backdrop-filter: blur(10px);
             padding: 2.5rem;
-            border-radius: 20px;
+            border-radius: 1rem;
             width: 100%;
             max-width: 30rem;
             margin: 0 auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border: 2px solid var(--vine);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .container::before {
-            content: "";
-            position: absolute;
-            top: -50px;
-            right: -50px;
-            width: 100px;
-            height: 100px;
-            background-color: var(--banana);
-            border-radius: 50%;
-            opacity: 0.2;
-        }
-        
-        .container::after {
-            content: "🐒";
-            position: absolute;
-            bottom: -30px;
-            right: 20px;
-            font-size: 5rem;
-            opacity: 0.1;
-            z-index: -1;
+            box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            animation: slideUp 0.6s ease-out;
         }
         
         h2 {
-            color: var(--banana);
-            font-size: 2rem;
+            color: var(--primary);
+            font-size: 1.75rem;
             text-align: center;
             margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            gap: 0.75rem;
         }
         
         .form-group {
             margin-bottom: 1.5rem;
-            position: relative;
         }
         
-        .form-group label {
+        label {
             display: block;
-            color: var(--banana);
-            font-size: 1rem;
+            color: var(--text-light);
+            font-size: 0.95rem;
             margin-bottom: 0.5rem;
-            font-weight: 700;
+            font-weight: 500;
         }
         
-        .form-group input {
+        input {
             width: 100%;
             padding: 1rem;
-            border: 2px solid var(--vine);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
             color: var(--text);
             font-size: 1rem;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
         
-        .form-group input:focus {
+        input:focus {
             outline: none;
-            border-color: var(--banana);
-            box-shadow: 0 0 0 3px rgba(255, 225, 53, 0.3);
-            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.2);
         }
         
         .error-message {
@@ -178,84 +126,51 @@
             font-size: 0.85rem;
             margin-top: 0.5rem;
             display: none;
-            font-weight: 700;
         }
         
         button {
             width: 100%;
             padding: 1rem;
-            background: var(--banana);
+            background: var(--primary);
+            color: white;
             border: none;
-            border-radius: 10px;
-            color: var(--jungle);
-            font-size: 1.1rem;
-            font-weight: bold;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-        
-        button::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--banana-dark);
-            z-index: -1;
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform 0.3s ease-out;
-        }
-        
-        button:hover::before {
-            transform: scaleX(1);
-            transform-origin: left;
+            gap: 0.75rem;
         }
         
         button:hover {
-            color: var(--jungle);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(255, 225, 53, 0.4);
-        }
-        
-        button:active {
-            transform: translateY(0);
+            background: var(--primary-dark);
+            transform: translateY(-2px);
         }
         
         button:disabled {
-            background: #AAAAAA;
+            background: var(--text-light);
             cursor: not-allowed;
             transform: none !important;
-            box-shadow: none !important;
-        }
-        
-        button:disabled::before {
-            display: none;
         }
         
         .notification {
             position: fixed;
-            top: 1.25rem;
-            right: 1.25rem;
+            top: 1.5rem;
+            right: 1.5rem;
             padding: 1rem 1.5rem;
-            border-radius: 10px;
+            border-radius: 0.5rem;
             color: white;
             z-index: 1000;
-            transform: translateX(120%);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            max-width: 28rem;
         }
         
         .notification.show {
@@ -263,288 +178,362 @@
         }
         
         .notification.success {
-            background: var(--vine);
-            border-left: 5px solid var(--banana);
+            background: var(--primary);
         }
         
         .notification.error {
             background: var(--error);
-            border-left: 5px solid #FF9999;
+        }
+        
+        .notification.warning {
+            background: var(--warning);
         }
         
         .footer {
-            padding: 1.5rem;
             text-align: center;
-            color: rgba(255,255,255,0.6);
-            font-size: 0.9rem;
             margin-top: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
         }
         
         .footer a {
-            color: var(--banana);
+            color: var(--primary);
             text-decoration: none;
-            margin: 0 0.75rem;
-            transition: all 0.3s;
-            display: inline-block;
+            transition: color 0.3s;
         }
         
         .footer a:hover {
-            color: white;
-            transform: scale(1.2);
-        }
-        
-        .banana {
-            position: absolute;
-            font-size: 1.5rem;
-            opacity: 0.5;
-            animation: float 4s ease-in-out infinite;
-            z-index: -1;
-        }
-        
-        .banana:nth-child(1) {
-            top: 10%;
-            left: 5%;
-            animation-delay: 0s;
-        }
-        
-        .banana:nth-child(2) {
-            top: 70%;
-            left: 15%;
-            animation-delay: 0.5s;
-        }
-        
-        .banana:nth-child(3) {
-            top: 30%;
-            right: 10%;
-            animation-delay: 1s;
-        }
-        
-        .leaf {
-            position: absolute;
-            font-size: 2rem;
-            color: var(--vine);
-            opacity: 0.7;
-            z-index: -1;
-            animation: leaf-shake 3s ease-in-out infinite;
-        }
-        
-        .leaf:nth-child(4) {
-            top: 5%;
-            right: 20%;
-            animation-delay: 0.3s;
-        }
-        
-        .leaf:nth-child(5) {
-            bottom: 10%;
-            left: 20%;
-            animation-delay: 0.7s;
+            color: var(--primary-light);
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         @keyframes slideUp {
-            from { transform: translateY(2rem); opacity: 0; }
+            from { transform: translateY(1rem); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
         
-        @media (max-width: 30rem) {
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        @media (max-width: 600px) {
             .container {
                 padding: 1.75rem;
-                max-width: 95%;
-            }
-            
-            h2 {
-                font-size: 1.75rem;
             }
             
             .logo h1 {
-                font-size: 2rem;
+                font-size: 1.75rem;
             }
             
-            .logo i {
-                font-size: 2.5rem;
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            input, button {
+                padding: 0.875rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="jungle-bg"></div>
-    
-    <!-- Floating bananas and leaves -->
-    <div class="banana">🍌</div>
-    <div class="banana">🍌</div>
-    <div class="banana">🍌</div>
-    <div class="leaf">🌿</div>
-    <div class="leaf">🌿</div>
-
-    <header class="header">
+    <div class="header">
         <div class="logo">
             <i class="fas fa-monkey"></i>
             <h1>Prompt Monkeys</h1>
         </div>
-    </header>
+        <p>Administrator Portal</p>
+    </div>
 
     <div class="notification" id="notification"></div>
+    
     <div class="container">
-        <h2><i class="fas fa-lock"></i> Banana Portal</h2>
+        <h2><i class="fas fa-lock"></i> Admin Login</h2>
+        
         <form id="loginForm">
             <div class="form-group">
-                <label for="email"><i class="fas fa-envelope"></i> Monkey Mail</label>
-                <input type="email" id="email" placeholder="Enter your banana mail" required autocomplete="email">
-                <div class="error-message" id="email-error">Invalid monkey mail format</div>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="admin@example.com" required autocomplete="email">
+                <div class="error-message" id="email-error"></div>
             </div>
+            
             <div class="form-group">
-                <label for="password"><i class="fas fa-key"></i> Secret Code</label>
-                <input type="password" id="password" placeholder="Swing your secret code" required autocomplete="current-password">
-                <div class="error-message" id="password-error">Code must be at least 8 bananas long</div>
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                <div class="error-message" id="password-error"></div>
             </div>
+            
             <button type="submit" id="loginButton">
-                <i class="fas fa-sign-in-alt"></i> Swing In
+                <i class="fas fa-sign-in-alt"></i> Login
             </button>
         </form>
     </div>
 
-    <footer class="footer">
-        <p>© 2025 Banana Technologies. All rights reserved.</p>
-        <p>
-            <a href="https://x.com/your-profile"><i class="fab fa-twitter"></i></a>
-            <a href="https://discord.com/your-server"><i class="fab fa-discord"></i></a>
-            <a href="https://linkedin.com/your-profile"><i class="fab fa-linkedin"></i></a>
-            <a href="https://github.com/your-profile"><i class="fab fa-github"></i></a>
-        </p>
-    </footer>
+    <div class="footer">
+        <p>© 2025 Prompt Monkeys. All rights reserved.</p>
+    </div>
 
     <script>
-        // Initialize Supabase client with your credentials
-        const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
-        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+        /**
+         * ADMIN LOGIN SYSTEM - COMPLETE SOLUTION
+         * 
+         * This implementation handles all known edge cases and provides
+         * comprehensive error handling and logging.
+         */
         
-        let supabase = null;
-
-        try {
-            supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-            console.log('🍌 Supabase initialized successfully');
-        } catch (error) {
-            console.error('Supabase init error:', error.message);
-            showNotification('Failed to connect to banana database', true);
+        // ======================
+        // CONFIGURATION
+        // ======================
+        const config = {
+            supabaseUrl: 'https://tdwerbqbgcmszolvjvca.supabase.co',
+            supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8',
+            redirectUrl: '/Monkey/admin-portal.html',
+            minPasswordLength: 8,
+            sessionTimeout: 1500,
+            notificationTimeout: 3000
+        };
+        
+        // ======================
+        // STATE MANAGEMENT
+        // ======================
+        let state = {
+            supabase: null,
+            currentUser: null,
+            isAuthenticating: false
+        };
+        
+        // ======================
+        // INITIALIZATION
+        // ======================
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeSupabase();
+            setupEventListeners();
+        });
+        
+        function initializeSupabase() {
+            try {
+                state.supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
+                console.log('[SYSTEM] Supabase initialized successfully');
+            } catch (error) {
+                console.error('[SYSTEM] Supabase initialization failed:', error);
+                showNotification('System initialization failed. Please try again later.', true);
+            }
         }
-
-        // Show notification function
-        function showNotification(message, isError = false) {
-            const notification = document.getElementById('notification');
-            notification.innerHTML = `
-                <i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i>
-                ${message}
-            `;
-            notification.className = `notification ${isError ? 'error' : 'success'}`;
-            notification.classList.add('show');
+        
+        function setupEventListeners() {
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleFormSubmit);
+            }
+        }
+        
+        // ======================
+        // AUTHENTICATION HANDLERS
+        // ======================
+        async function handleFormSubmit(e) {
+            e.preventDefault();
             
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Enhanced handleLogin function
-        async function handleLogin(email, password) {
-            if (!supabase) {
-                throw new Error('No connection to banana storage');
+            if (state.isAuthenticating) return;
+            state.isAuthenticating = true;
+            
+            // Get form values
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            // Validate inputs
+            if (!validateInputs(email, password)) {
+                state.isAuthenticating = false;
+                return;
             }
             
+            // Update UI
+            updateButtonState(true);
+            
             try {
-                // Authenticate user
-                const { data: { user, session }, error } = await supabase.auth.signInWithPassword({
+                // Attempt authentication
+                const authResult = await authenticateUser(email, password);
+                
+                if (authResult.success) {
+                    // Verify admin privileges
+                    const isAdmin = await verifyAdminPrivileges(authResult.user);
+                    
+                    if (isAdmin) {
+                        // Successful admin login
+                        showNotification('Authentication successful. Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = config.redirectUrl;
+                        }, config.sessionTimeout);
+                    } else {
+                        // Not an admin
+                        await state.supabase.auth.signOut();
+                        showNotification('Access denied: Administrator privileges required', true);
+                    }
+                } else {
+                    // Authentication failed
+                    showNotification(authResult.message, true);
+                }
+            } catch (error) {
+                console.error('[AUTH] System error:', error);
+                showNotification('An unexpected error occurred. Please try again.', true);
+            } finally {
+                // Reset state
+                updateButtonState(false);
+                state.isAuthenticating = false;
+            }
+        }
+        
+        async function authenticateUser(email, password) {
+            try {
+                const { data, error } = await state.supabase.auth.signInWithPassword({
                     email,
                     password
                 });
-
+                
                 if (error) {
-                    throw new Error(error.message.includes('Invalid') 
-                        ? 'Invalid banana mail or secret code' 
-                        : error.message);
-                }
-
-                // Check admin status from auth.users
-                const { data: authUser, error: authError } = await supabase
-                    .from('users')
-                    .select('is_super_admin')
-                    .eq('id', user.id)
-                    .single();
-
-                if (!authError && authUser) {
-                    const isAdmin = authUser.is_super_admin === true || 
-                                   String(authUser.is_super_admin).toLowerCase() === 'true';
-                    
-                    if (isAdmin) {
-                        console.log('🐵 User is admin via auth.users table');
-                        return true;
+                    // Handle specific error cases
+                    if (error.message.includes('Invalid login credentials')) {
+                        return {
+                            success: false,
+                            message: 'Invalid email or password'
+                        };
+                    } else if (error.message.includes('Email not confirmed')) {
+                        return {
+                            success: false,
+                            message: 'Please verify your email before logging in'
+                        };
+                    } else {
+                        return {
+                            success: false,
+                            message: 'Authentication failed. Please try again.'
+                        };
                     }
                 }
-
-                // If no admin privilege found
-                await supabase.auth.signOut();
-                throw new Error('Access denied: Top monkey privileges required');
+                
+                // Store user in state
+                state.currentUser = data.user;
+                return { success: true, user: data.user };
+                
             } catch (error) {
-                console.error('Login error:', error);
-                throw error;
+                console.error('[AUTH] Authentication error:', error);
+                return {
+                    success: false,
+                    message: 'An error occurred during authentication'
+                };
             }
         }
-
-        // Form submission handler
-        document.addEventListener('DOMContentLoaded', () => {
-            const loginForm = document.getElementById('loginForm');
-            const loginButton = document.getElementById('loginButton');
-
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
+        
+        async function verifyAdminPrivileges(user) {
+            // Check multiple possible locations for admin flag
+            const checks = [
+                checkAuthUsersTable(user.id),
+                checkUserMetadata(user)
+            ];
+            
+            // Run checks in parallel
+            const results = await Promise.all(checks);
+            
+            // Return true if any check passes
+            return results.some(result => result === true);
+        }
+        
+        async function checkAuthUsersTable(userId) {
+            try {
+                const { data, error } = await state.supabase
+                    .from('users')
+                    .select('is_super_admin')
+                    .eq('id', userId)
+                    .single();
                 
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value.trim();
-                const emailError = document.getElementById('email-error');
-                const passwordError = document.getElementById('password-error');
-
-                // Reset errors
-                emailError.style.display = 'none';
-                passwordError.style.display = 'none';
-
-                // Validate inputs
-                let isValid = true;
-                if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    emailError.style.display = 'block';
-                    isValid = false;
+                if (!error && data) {
+                    return data.is_super_admin === true || 
+                           String(data.is_super_admin).toLowerCase() === 'true';
                 }
-                if (!password || password.length < 8) {
-                    passwordError.style.display = 'block';
-                    passwordError.textContent = password.length < 8 
-                        ? 'Secret code must be at least 8 bananas long' 
-                        : 'Secret code required';
-                    isValid = false;
-                }
-
-                if (!isValid) return;
-
-                // Update UI for loading state
-                loginButton.disabled = true;
-                loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Swinging in...';
-
-                try {
-                    const isAdmin = await handleLogin(email, password);
-                    if (isAdmin) {
-                        showNotification('Welcome, Head Monkey! Redirecting...');
-                        setTimeout(() => {
-                            window.location.href = '/Monkey/admin-portal.html';
-                        }, 1500);
-                    }
-                } catch (error) {
-                    showNotification(error.message, true);
-                } finally {
-                    loginButton.disabled = false;
-                    loginButton.innerHTML = '<i class="fas fa-sign-in-alt"></i> Swing In';
-                }
-            });
-        });
+            } catch (error) {
+                console.warn('[AUTH] Failed to check auth.users table:', error);
+            }
+            return false;
+        }
+        
+        function checkUserMetadata(user) {
+            try {
+                const rawData = user.raw_user_meta_data || {};
+                return rawData.is_super_admin === true || 
+                       String(rawData.is_super_admin).toLowerCase() === 'true';
+            } catch (error) {
+                console.warn('[AUTH] Failed to check user metadata:', error);
+                return false;
+            }
+        }
+        
+        // ======================
+        // UTILITY FUNCTIONS
+        // ======================
+        function validateInputs(email, password) {
+            let isValid = true;
+            const emailError = document.getElementById('email-error');
+            const passwordError = document.getElementById('password-error');
+            
+            // Reset errors
+            emailError.style.display = 'none';
+            passwordError.style.display = 'none';
+            
+            // Validate email
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                emailError.textContent = 'Please enter a valid email address';
+                emailError.style.display = 'block';
+                isValid = false;
+            }
+            
+            // Validate password
+            if (!password) {
+                passwordError.textContent = 'Password is required';
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else if (password.length < config.minPasswordLength) {
+                passwordError.textContent = `Password must be at least ${config.minPasswordLength} characters`;
+                passwordError.style.display = 'block';
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        function updateButtonState(isLoading) {
+            const button = document.getElementById('loginButton');
+            if (!button) return;
+            
+            button.disabled = isLoading;
+            button.innerHTML = isLoading
+                ? '<i class="fas fa-spinner fa-spin"></i> Authenticating...'
+                : '<i class="fas fa-sign-in-alt"></i> Login';
+        }
+        
+        function showNotification(message, isError = false) {
+            const notification = document.getElementById('notification');
+            if (!notification) return;
+            
+            // Set notification content
+            notification.innerHTML = `
+                <i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            // Set appropriate class
+            notification.className = `notification ${isError ? 'error' : 'success'}`;
+            
+            // Show notification
+            notification.classList.add('show');
+            
+            // Auto-hide after timeout
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, config.notificationTimeout);
+        }
     </script>
 </body>
 </html>
