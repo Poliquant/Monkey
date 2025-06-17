@@ -239,6 +239,14 @@
             </div>
             <button type="submit" id="loginButton"><i class="fas fa-sign-in-alt"></i> Login</button>
         </form>
+        
+        <div style="margin-top: 20px; text-align: center;">
+            <p style="color: var(--text-light); font-size: 0.9rem;">
+                <strong>Test Admin Credentials:</strong><br>
+                Email: testadmin@promptmonkeys.com<br>
+                Password: AdminTest123!
+            </p>
+        </div>
     </div>
 
     <footer class="footer">
@@ -280,7 +288,7 @@
             }, 3000);
         }
 
-        // Fixed handleLogin function with robust admin check
+        // Fixed handleLogin function with direct admin check
         async function handleLogin(email, password) {
             if (!supabase) {
                 throw new Error('Database connection not established');
@@ -299,17 +307,26 @@
                         : error.message);
                 }
 
-                // Robust admin check that handles all cases
-                const isAdmin = user.is_super_admin === true || 
-                               user.is_super_admin === 'true' ||
-                               (user.raw_user_meta_data && 
-                                (user.raw_user_meta_data.is_super_admin === true || 
-                                 user.raw_user_meta_data.is_super_admin === 'true'));
+                // Directly query the users table for admin status
+                const { data: adminData, error: adminError } = await supabase
+                    .from('users')
+                    .select('is_super_admin')
+                    .eq('id', user.id)
+                    .single();
+
+                if (adminError) {
+                    console.error('Admin check error:', adminError);
+                    throw new Error('Failed to verify admin privileges');
+                }
+
+                // Robust admin check
+                const isAdmin = adminData.is_super_admin === true || 
+                               String(adminData.is_super_admin).toLowerCase() === 'true';
 
                 console.log('Admin check results:', {
                     email: user.email,
-                    is_super_admin: user.is_super_admin,
-                    raw_user_meta_data: user.raw_user_meta_data,
+                    is_super_admin: adminData.is_super_admin,
+                    type: typeof adminData.is_super_admin,
                     isAdmin: isAdmin
                 });
 
