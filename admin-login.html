@@ -3,84 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login | Prompt Monkeys</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+    <title>Admin Login - Prompt Monkeys</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="console.log('Font Awesome loaded')" onerror="console.error('Failed to load Font Awesome')">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" onload="console.log('Supabase JS loaded')" onerror="console.error('Failed to load Supabase JS')"></script>
     <style>
         :root {
             --primary: #1DB954;
             --primary-dark: #1AA34A;
-            --primary-light: #4cd97f;
             --background: #121212;
-            --card-bg: #1f1f1f;
+            --card-bg: rgba(31, 31, 31, 0.85);
             --text: #FFFFFF;
             --text-light: #B3B3B3;
             --error: #FF4D4D;
-            --warning: #FFA726;
-            --border: #333;
             --gradient: linear-gradient(135deg, #121212 0%, #1a3c1a 100%);
         }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
         body {
             background: var(--gradient);
             color: var(--text);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: space-between;
             padding: 1rem;
-            line-height: 1.6;
+            overflow-x: hidden;
         }
-        
         .header {
-            text-align: center;
-            margin-bottom: 2rem;
-            animation: fadeIn 0.8s ease-out;
-        }
-        
-        .logo {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+            padding: 1rem;
+            animation: fadeIn 1s ease-out;
         }
-        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
         .logo i {
-            font-size: 2.5rem;
-            color: var(--primary);
-            animation: bounce 2s infinite;
-        }
-        
-        .logo h1 {
             font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(to right, var(--primary), var(--primary-light));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            color: var(--primary);
+            transition: transform 0.3s;
         }
-        
+        .logo i:hover {
+            transform: rotate(10deg);
+        }
+        .logo h1 {
+            font-size: 1.75rem;
+            color: var(--text);
+            font-weight: 600;
+        }
         .container {
             background: var(--card-bg);
             backdrop-filter: blur(10px);
-            padding: 2.5rem;
+            padding: 2rem;
             border-radius: 1rem;
             width: 100%;
-            max-width: 30rem;
-            margin: 0 auto;
-            box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
-            animation: slideUp 0.6s ease-out;
+            max-width: 28rem;
+            margin: auto;
+            box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: slideUp 0.8s ease-out;
         }
-        
         h2 {
             color: var(--primary);
             font-size: 1.75rem;
@@ -89,206 +78,177 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
-        
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
+            position: relative;
         }
-        
         label {
             display: block;
             color: var(--text-light);
-            font-size: 0.95rem;
+            font-size: 0.875rem;
             margin-bottom: 0.5rem;
-            font-weight: 500;
+            transition: color 0.3s;
         }
-        
         input {
             width: 100%;
-            padding: 1rem;
-            background: rgba(30, 30, 30, 0.8);
-            border: 1px solid var(--border);
+            padding: 0.75rem;
+            border: 1px solid var(--text-light);
             border-radius: 0.5rem;
+            background: rgba(42, 42, 42, 0.9);
             color: var(--text);
             font-size: 1rem;
-            transition: all 0.3s ease;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        
         input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.2);
+            box-shadow: 0 0 0.5rem rgba(29, 185, 84, 0.3);
         }
-        
         .error-message {
             color: var(--error);
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
             display: none;
         }
-        
         button {
             width: 100%;
-            padding: 1rem;
+            padding: 0.875rem;
             background: var(--primary);
-            color: white;
             border: none;
             border-radius: 0.5rem;
+            color: var(--text);
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background 0.3s, transform 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
-        
         button:hover {
             background: var(--primary-dark);
-            transform: translateY(-2px);
+            transform: translateY(-0.125rem);
         }
-        
         button:disabled {
             background: var(--text-light);
             cursor: not-allowed;
-            transform: none !important;
         }
-        
         .notification {
             position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
-            padding: 1rem 1.5rem;
+            top: 1.25rem;
+            right: 1.25rem;
+            padding: 0.9375rem 1.25rem;
             border-radius: 0.5rem;
-            color: white;
+            color: var(--text);
             z-index: 1000;
-            box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.3s ease-in-out;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            transform: translateX(120%);
-            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            max-width: 28rem;
+            gap: 0.5rem;
         }
-        
         .notification.show {
             transform: translateX(0);
         }
-        
         .notification.success {
             background: var(--primary);
         }
-        
         .notification.error {
             background: var(--error);
         }
-        
-        .notification.warning {
-            background: var(--warning);
-        }
-        
         .footer {
+            padding: 1rem;
             text-align: center;
-            margin-top: 2rem;
             color: var(--text-light);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
         }
-        
         .footer a {
             color: var(--primary);
             text-decoration: none;
+            margin: 0 0.5rem;
             transition: color 0.3s;
         }
-        
         .footer a:hover {
-            color: var(--primary-light);
+            color: var(--primary-dark);
         }
-        
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-        
         @keyframes slideUp {
-            from { transform: translateY(1rem); opacity: 0; }
+            from { transform: translateY(2rem); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-        
-        @media (max-width: 600px) {
+        @media (max-width: 30rem) {
             .container {
-                padding: 1.75rem;
+                padding: 1.5rem;
+                max-width: 90%;
             }
-            
-            .logo h1 {
-                font-size: 1.75rem;
-            }
-            
             h2 {
                 font-size: 1.5rem;
             }
-            
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+            .logo i {
+                font-size: 1.75rem;
+            }
             input, button {
-                padding: 0.875rem;
+                font-size: 0.875rem;
+            }
+        }
+        @media (min-width: 48rem) {
+            .container {
+                max-width: 32rem;
+            }
+            h2 {
+                font-size: 2rem;
+            }
+            .logo h1 {
+                font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
+    <header class="header">
         <div class="logo">
             <i class="fas fa-monkey"></i>
             <h1>Prompt Monkeys</h1>
         </div>
-        <p>Administrator Portal</p>
-    </div>
+    </header>
 
     <div class="notification" id="notification"></div>
-    
     <div class="container">
         <h2><i class="fas fa-lock"></i> Admin Login</h2>
-        
         <form id="loginForm">
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="admin@example.com" required autocomplete="email">
-                <div class="error-message" id="email-error"></div>
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter email" required autocomplete="email">
+                <div class="error-message" id="email-error">Invalid email format</div>
             </div>
-            
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
-                <div class="error-message" id="password-error"></div>
+                <input type="password" id="password" placeholder="Enter password" required autocomplete="current-password">
+                <div class="error-message" id="password-error">Password required</div>
             </div>
-            
-            <button type="submit" id="loginButton">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </button>
+            <button type="submit" id="loginButton"><i class="fas fa-sign-in-alt"></i> Login</button>
         </form>
     </div>
 
-    <div class="footer">
+    <footer class="footer">
         <p>© 2025 Prompt Monkeys. All rights reserved.</p>
-    </div>
+        <p>
+            <a href="https://x.com/your-profile"><i class="fab fa-twitter"></i></a>
+            <a href="https://discord.com/your-server"><i class="fab fa-discord"></i></a>
+            <a href="https://linkedin.com/your-profile"><i class="fab fa-linkedin"></i></a>
+        </p>
+    </footer>
 
     <script>
-        /**
-         * ADMIN LOGIN SYSTEM - COMPLETE SOLUTION
-         * 
-         * This implementation handles all known edge cases and provides
-         * comprehensive error handling and logging.
-         */
-        
-        // ======================
-        // CONFIGURATION
-        // ======================
         const config = {
             supabaseUrl: 'https://tdwerbqbgcmszolvjvca.supabase.co',
             supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8',
@@ -297,242 +257,137 @@
             sessionTimeout: 1500,
             notificationTimeout: 3000
         };
-        
-        // ======================
-        // STATE MANAGEMENT
-        // ======================
+
         let state = {
             supabase: null,
             currentUser: null,
             isAuthenticating: false
         };
-        
-        // ======================
-        // INITIALIZATION
-        // ======================
+
         document.addEventListener('DOMContentLoaded', () => {
             initializeSupabase();
             setupEventListeners();
         });
-        
+
         function initializeSupabase() {
             try {
                 state.supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
-                console.log('[SYSTEM] Supabase initialized successfully');
-            } catch (error) {
-                console.error('[SYSTEM] Supabase initialization failed:', error);
-                showNotification('System initialization failed. Please try again later.', true);
+                console.log('[INIT] Supabase client initialized');
+            } catch (err) {
+                console.error('[INIT] Supabase init error:', err);
+                showNotification('Could not initialize system', true);
             }
         }
-        
+
         function setupEventListeners() {
             const loginForm = document.getElementById('loginForm');
             if (loginForm) {
                 loginForm.addEventListener('submit', handleFormSubmit);
             }
         }
-        
-        // ======================
-        // AUTHENTICATION HANDLERS
-        // ======================
+
         async function handleFormSubmit(e) {
             e.preventDefault();
-            
             if (state.isAuthenticating) return;
-            state.isAuthenticating = true;
-            
-            // Get form values
+
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
-            
-            // Validate inputs
-            if (!validateInputs(email, password)) {
-                state.isAuthenticating = false;
+            const emailError = document.getElementById('email-error');
+            const passwordError = document.getElementById('password-error');
+
+            emailError.style.display = 'none';
+            passwordError.style.display = 'none';
+
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                emailError.textContent = 'Invalid email address';
+                emailError.style.display = 'block';
                 return;
             }
-            
-            // Update UI
+
+            if (!password || password.length < config.minPasswordLength) {
+                passwordError.textContent = `Password must be at least ${config.minPasswordLength} characters`;
+                passwordError.style.display = 'block';
+                return;
+            }
+
+            state.isAuthenticating = true;
             updateButtonState(true);
-            
+
             try {
-                // Attempt authentication
-                const authResult = await authenticateUser(email, password);
-                
-                if (authResult.success) {
-                    // Verify admin privileges
-                    const isAdmin = await verifyAdminPrivileges(authResult.user);
-                    
-                    if (isAdmin) {
-                        // Successful admin login
-                        showNotification('Authentication successful. Redirecting...');
-                        setTimeout(() => {
-                            window.location.href = config.redirectUrl;
-                        }, config.sessionTimeout);
-                    } else {
-                        // Not an admin
-                        await state.supabase.auth.signOut();
-                        showNotification('Access denied: Administrator privileges required', true);
-                    }
-                } else {
-                    // Authentication failed
-                    showNotification(authResult.message, true);
+                const { data, error } = await state.supabase.auth.signInWithPassword({ email, password });
+
+                if (error || !data.user) {
+                    showNotification('Login failed: ' + (error?.message || 'Unknown error'), true);
+                    updateButtonState(false);
+                    state.isAuthenticating = false;
+                    return;
                 }
-            } catch (error) {
-                console.error('[AUTH] System error:', error);
-                showNotification('An unexpected error occurred. Please try again.', true);
+
+                const user = data.user;
+                state.currentUser = user;
+
+                const isAdmin = await isUserAdmin(user);
+
+                if (isAdmin) {
+                    showNotification('Login successful. Redirecting...');
+                    setTimeout(() => window.location.href = config.redirectUrl, config.sessionTimeout);
+                } else {
+                    await state.supabase.auth.signOut();
+                    showNotification('Access denied: Administrator privileges required', true);
+                }
+
+            } catch (err) {
+                console.error('[LOGIN] Unexpected error:', err);
+                showNotification('Unexpected error occurred', true);
             } finally {
-                // Reset state
                 updateButtonState(false);
                 state.isAuthenticating = false;
             }
         }
-        
-        async function authenticateUser(email, password) {
+
+        async function isUserAdmin(user) {
             try {
-                const { data, error } = await state.supabase.auth.signInWithPassword({
-                    email,
-                    password
+                console.log('[AUTH] Checking admin status for user:', user.email, 'ID:', user.id);
+                const rawMetadata = user.raw_user_meta_data || {};
+                const isSuperAdmin = rawMetadata.is_super_admin;
+                const isAdmin = String(isSuperAdmin).toLowerCase() === 'true';
+
+                console.log('[AUTH] Admin check:', {
+                    email: user.email,
+                    raw_user_meta_data: JSON.stringify(rawMetadata, null, 2),
+                    is_super_admin: isSuperAdmin,
+                    is_admin: isAdmin
                 });
-                
-                if (error) {
-                    // Handle specific error cases
-                    if (error.message.includes('Invalid login credentials')) {
-                        return {
-                            success: false,
-                            message: 'Invalid email or password'
-                        };
-                    } else if (error.message.includes('Email not confirmed')) {
-                        return {
-                            success: false,
-                            message: 'Please verify your email before logging in'
-                        };
-                    } else {
-                        return {
-                            success: false,
-                            message: 'Authentication failed. Please try again.'
-                        };
-                    }
-                }
-                
-                // Store user in state
-                state.currentUser = data.user;
-                return { success: true, user: data.user };
-                
-            } catch (error) {
-                console.error('[AUTH] Authentication error:', error);
-                return {
-                    success: false,
-                    message: 'An error occurred during authentication'
-                };
-            }
-        }
-        
-        async function verifyAdminPrivileges(user) {
-            // Check multiple possible locations for admin flag
-            const checks = [
-                checkAuthUsersTable(user.id),
-                checkUserMetadata(user)
-            ];
-            
-            // Run checks in parallel
-            const results = await Promise.all(checks);
-            
-            // Return true if any check passes
-            return results.some(result => result === true);
-        }
-        
-        async function checkAuthUsersTable(userId) {
-            try {
-                const { data, error } = await state.supabase
-                    .from('users')
-                    .select('is_super_admin')
-                    .eq('id', userId)
-                    .single();
-                
-                if (!error && data) {
-                    return data.is_super_admin === true || 
-                           String(data.is_super_admin).toLowerCase() === 'true';
-                }
-            } catch (error) {
-                console.warn('[AUTH] Failed to check auth.users table:', error);
-            }
-            return false;
-        }
-        
-        function checkUserMetadata(user) {
-            try {
-                const rawData = user.raw_user_meta_data || {};
-                return rawData.is_super_admin === true || 
-                       String(rawData.is_super_admin).toLowerCase() === 'true';
-            } catch (error) {
-                console.warn('[AUTH] Failed to check user metadata:', error);
+
+                return isAdmin;
+            } catch (err) {
+                console.warn('[AUTH] Failed to verify admin:', err);
                 return false;
             }
         }
-        
-        // ======================
-        // UTILITY FUNCTIONS
-        // ======================
-        function validateInputs(email, password) {
-            let isValid = true;
-            const emailError = document.getElementById('email-error');
-            const passwordError = document.getElementById('password-error');
-            
-            // Reset errors
-            emailError.style.display = 'none';
-            passwordError.style.display = 'none';
-            
-            // Validate email
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                emailError.textContent = 'Please enter a valid email address';
-                emailError.style.display = 'block';
-                isValid = false;
-            }
-            
-            // Validate password
-            if (!password) {
-                passwordError.textContent = 'Password is required';
-                passwordError.style.display = 'block';
-                isValid = false;
-            } else if (password.length < config.minPasswordLength) {
-                passwordError.textContent = `Password must be at least ${config.minPasswordLength} characters`;
-                passwordError.style.display = 'block';
-                isValid = false;
-            }
-            
-            return isValid;
-        }
-        
-        function updateButtonState(isLoading) {
-            const button = document.getElementById('loginButton');
-            if (!button) return;
-            
-            button.disabled = isLoading;
-            button.innerHTML = isLoading
+
+        function updateButtonState(loading) {
+            const btn = document.getElementById('loginButton');
+            if (!btn) return;
+
+            btn.disabled = loading;
+            btn.innerHTML = loading
                 ? '<i class="fas fa-spinner fa-spin"></i> Authenticating...'
                 : '<i class="fas fa-sign-in-alt"></i> Login';
         }
-        
+
         function showNotification(message, isError = false) {
-            const notification = document.getElementById('notification');
-            if (!notification) return;
-            
-            // Set notification content
-            notification.innerHTML = `
+            const note = document.getElementById('notification');
+            if (!note) return;
+
+            note.innerHTML = `
                 <i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
                 <span>${message}</span>
             `;
-            
-            // Set appropriate class
-            notification.className = `notification ${isError ? 'error' : 'success'}`;
-            
-            // Show notification
-            notification.classList.add('show');
-            
-            // Auto-hide after timeout
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, config.notificationTimeout);
+
+            note.className = `notification ${isError ? 'error' : 'success'} show`;
+
+            setTimeout(() => note.classList.remove('show'), config.notificationTimeout);
         }
     </script>
 </body>
