@@ -329,7 +329,7 @@
                 console.log('[DEBUG] Auth user ID:', user.id);
                 console.log('[DEBUG] Auth user email:', user.email);
 
-                const isAdmin = await checkAuthUsersTable(user.email);
+                const isAdmin = await isUserAdmin(user);
 
                 if (isAdmin) {
                     showNotification('Login successful. Redirecting...');
@@ -348,24 +348,23 @@
             }
         }
 
-        async function checkAuthUsersTable(email) {
+        async function isUserAdmin(user) {
             try {
-                const { data, error } = await state.supabase
-                    .from('users')
-                    .select('is_super_admin')
-                    .eq('email', email)
-                    .maybeSingle();
+                console.log('[AUTH] Checking admin status for user:', user.email, 'ID:', user.id);
+                const rawMetadata = user.raw_user_meta_data || {};
+                const isSuperAdmin = rawMetadata.is_super_admin;
+                const isAdmin = String(isSuperAdmin).toLowerCase() === 'true';
 
-                if (error) {
-                    console.warn('[AUTH] Error querying users table:', error);
-                    return false;
-                }
+                console.log('[AUTH] Admin check:', {
+                    email: user.email,
+                    raw_user_meta_data: JSON.stringify(rawMetadata, null, 2),
+                    is_super_admin: isSuperAdmin,
+                    is_admin: isAdmin
+                });
 
-                console.log('[AUTH] Users table result:', data);
-
-                return data?.is_super_admin === true;
+                return isAdmin;
             } catch (err) {
-                console.warn('[AUTH] Failed to check users table:', err);
+                console.warn('[AUTH] Failed to verify admin:', err);
                 return false;
             }
         }
