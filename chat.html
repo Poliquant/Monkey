@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prompt Monkeys - Financial Community Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
         :root {
             --primary: #1DB954;
@@ -609,6 +610,26 @@
             background-color: var(--warning);
         }
 
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Responsive Adjustments */
         @media (max-width: 768px) {
             .header {
@@ -723,7 +744,9 @@
         </div>
 
         <main class="posts-container" id="postsContainer">
-            <!-- Posts will be dynamically inserted here -->
+            <div class="loading" id="loadingPosts">
+                <div class="loading-spinner"></div>
+            </div>
         </main>
 
         <aside class="sidebar">
@@ -782,6 +805,18 @@
     </div>
 
     <script>
+        // Supabase Configuration
+        const config = {
+            supabaseUrl: 'https://tdwerbqbgcmszolvjvca.supabase.co',
+            supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8',
+            postsTable: 'posts',
+            commentsTable: 'comments',
+            profilesTable: 'profiles'
+        };
+
+        // Initialize Supabase
+        const supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
+
         // Time formatting function
         function formatTime(date) {
             const now = new Date();
@@ -795,122 +830,81 @@
             return postDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
-        // Sample data for demonstration
-        const samplePosts = [
-            {
-                id: 1,
-                title: "Bitcoin Analysis: Bullish Signals Emerging",
-                author: "CryptoExpert",
-                content: `<p>Recent on-chain data shows strong accumulation by large holders, suggesting institutional interest is growing. The Puell Multiple, which measures miner revenue relative to yearly averages, has dipped into the green zone historically associated with early bull markets.</p>
-                <p>Key resistance at $65K needs to be broken for confirmation of a new upward trend. Support remains strong at $58K-$60K. My medium-term target remains $85K by Q3, with potential for $100K+ if ETF inflows continue at current pace.</p>`,
-                upvotes: 142,
-                downvotes: 8,
-                created_at: new Date(Date.now() - 7200000).toISOString(),
-                is_admin: true,
-                comments: [
-                    {
-                        id: 1,
-                        author: "CryptoTrader",
-                        content: "Great analysis! What's your take on the recent miner capitulation? Could that delay the bull run?",
-                        upvotes: 15,
-                        downvotes: 2,
-                        created_at: new Date(Date.now() - 3600000).toISOString(),
-                        is_admin: false
-                    },
-                    {
-                        id: 2,
-                        author: "Investor123",
-                        content: "I agree with the $85K target. The halving effects typically show 9-12 months later, which aligns with your Q3 projection.",
-                        upvotes: 8,
-                        downvotes: 0,
-                        created_at: new Date(Date.now() - 1800000).toISOString(),
-                        is_admin: false
-                    }
-                ]
-            },
-            {
-                id: 2,
-                title: "Tech Earnings Preview: Focus on Cloud & AI Growth",
-                author: "MarketAnalyst",
-                content: `<p>Big tech earnings begin next week with MSFT, GOOGL, and META reporting. Key focus areas:</p>
-                <ul>
-                    <li>Azure/Google Cloud growth rates - watch for stabilization</li>
-                    <li>AI monetization progress - especially Copilot adoption</li>
-                    <li>Advertising trends - consumer spending indicators</li>
-                    <li>Capital expenditure guidance - AI infrastructure investments</li>
-                </ul>
-                <p>MSFT remains my top pick given diversified exposure and leading position in enterprise AI.</p>`,
-                upvotes: 98,
-                downvotes: 12,
-                created_at: new Date(Date.now() - 18000000).toISOString(),
-                is_admin: true,
-                comments: [
-                    {
-                        id: 3,
-                        author: "TechInvestor",
-                        content: "What about AMZN? Their AWS growth has been accelerating and they're making big moves in AI with Bedrock.",
-                        upvotes: 12,
-                        downvotes: 1,
-                        created_at: new Date(Date.now() - 10800000).toISOString(),
-                        is_admin: false
-                    },
-                    {
-                        id: 4,
-                        author: "QuantTrader",
-                        content: "I'm watching the capex guidance closely. If they signal slowdown in AI investments, that could hit chip stocks.",
-                        upvotes: 6,
-                        downvotes: 0,
-                        created_at: new Date(Date.now() - 5400000).toISOString(),
-                        is_admin: false
-                    }
-                ]
-            },
-            {
-                id: 3,
-                title: "Fed Meeting Preview: Rate Cut Expectations",
-                author: "FinanceGuru",
-                content: `<p>The Fed meets next week with markets pricing in:</p>
-                <ul>
-                    <li>85% chance of no change to rates</li>
-                    <li>15% chance of 25bps cut</li>
-                    <li>Dot plot revisions will be key - watch for 2024 median projection</li>
-                </ul>
-                <p>My view: Powell will maintain hawkish tone but signal openness to cuts if inflation data cooperates. September remains most likely start date for easing cycle.</p>`,
-                upvotes: 76,
-                downvotes: 5,
-                created_at: new Date(Date.now() - 28800000).toISOString(),
-                is_admin: true,
-                comments: [
-                    {
-                        id: 5,
-                        author: "BondTrader",
-                        content: "The 2-10 yield curve is steepening again. That usually precedes rate cuts by 6-9 months. Agree with your September call.",
-                        upvotes: 9,
-                        downvotes: 0,
-                        created_at: new Date(Date.now() - 14400000).toISOString(),
-                        is_admin: false
-                    }
-                ]
-            }
-        ];
-
         // UI Controller
         const uiController = {
             currentUser: null,
             votedPosts: new Set(),
             votedComments: new Set(),
+            posts: [],
 
-            init() {
-                this.renderPosts();
+            async init() {
                 this.setupEventListeners();
+                await this.loadPosts();
                 this.simulateActiveUsers();
+            },
+
+            async loadPosts() {
+                try {
+                    // Fetch posts with author information
+                    const { data: posts, error } = await supabase
+                        .from(config.postsTable)
+                        .select(`
+                            id,
+                            title,
+                            content,
+                            created_at,
+                            upvotes,
+                            downvotes,
+                            profiles ( username )
+                        `)
+                        .order('created_at', { ascending: false });
+
+                    if (error) throw error;
+
+                    // For each post, fetch comments
+                    for (let post of posts) {
+                        const comments = await this.loadComments(post.id);
+                        post.comments = comments;
+                    }
+
+                    this.posts = posts;
+                    this.renderPosts();
+                    this.updateStats();
+                } catch (error) {
+                    console.error('Error loading posts:', error);
+                    this.showNotification('Failed to load posts', 'error');
+                } finally {
+                    document.getElementById('loadingPosts').style.display = 'none';
+                }
+            },
+
+            async loadComments(postId) {
+                try {
+                    const { data: comments, error } = await supabase
+                        .from(config.commentsTable)
+                        .select(`
+                            id,
+                            content,
+                            created_at,
+                            upvotes,
+                            downvotes,
+                            profiles ( username )
+                        `)
+                        .eq('post_id', postId)
+                        .order('created_at', { ascending: true });
+
+                    return comments || [];
+                } catch (error) {
+                    console.error('Error loading comments:', error);
+                    return [];
+                }
             },
 
             renderPosts() {
                 const postsContainer = document.getElementById('postsContainer');
                 postsContainer.innerHTML = '';
 
-                if (samplePosts.length === 0) {
+                if (this.posts.length === 0) {
                     postsContainer.innerHTML = `
                         <div class="post">
                             <div class="post-content" style="text-align: center; padding: 40px 15px;">
@@ -922,17 +916,17 @@
                     return;
                 }
 
-                samplePosts.forEach(post => {
+                this.posts.forEach(post => {
                     const postElement = document.createElement('article');
                     postElement.className = 'post fade-in';
                     postElement.innerHTML = `
                         <div class="post-header">
-                            <div class="post-avatar">${post.author.charAt(0)}</div>
+                            <div class="post-avatar">${post.profiles?.username?.charAt(0) || 'A'}</div>
                             <div class="post-info">
                                 <h2 class="post-title">${post.title}</h2>
                                 <div class="post-meta">
-                                    <span>${post.author}</span>
-                                    ${post.is_admin ? '<span class="badge badge-admin">Admin</span>' : ''}
+                                    <span>${post.profiles?.username || 'Admin'}</span>
+                                    <span class="badge badge-admin">Admin</span>
                                     <span class="post-time">
                                         <i class="far fa-clock"></i>
                                         <span>${formatTime(post.created_at)}</span>
@@ -946,15 +940,15 @@
                         <div class="post-actions">
                             <button class="action-btn upvote ${this.votedPosts.has(post.id) ? 'active' : ''}" data-post="${post.id}">
                                 <i class="fas fa-arrow-up"></i>
-                                <span class="vote-count">${post.upvotes}</span>
+                                <span class="vote-count">${post.upvotes || 0}</span>
                             </button>
                             <button class="action-btn downvote" data-post="${post.id}">
                                 <i class="fas fa-arrow-down"></i>
-                                <span class="vote-count">${post.downvotes}</span>
+                                <span class="vote-count">${post.downvotes || 0}</span>
                             </button>
                             <button class="action-btn">
                                 <i class="far fa-comment"></i>
-                                <span>${post.comments.length}</span>
+                                <span>${post.comments?.length || 0}</span>
                             </button>
                             <button class="action-btn">
                                 <i class="far fa-bookmark"></i>
@@ -971,10 +965,11 @@
                         </div>
                     `;
                     postsContainer.appendChild(postElement);
-                    this.renderComments(post.id, post.comments);
+                    
+                    if (post.comments && post.comments.length > 0) {
+                        this.renderComments(post.id, post.comments);
+                    }
                 });
-
-                this.updateStats();
             },
 
             renderComments(postId, comments) {
@@ -983,17 +978,13 @@
 
                 commentsList.innerHTML = '';
 
-                if (comments.length === 0) {
-                    return;
-                }
-
                 comments.forEach(comment => {
                     const commentElement = document.createElement('div');
                     commentElement.className = 'comment fade-in';
                     commentElement.innerHTML = `
                         <div class="comment-header">
-                            <div class="comment-avatar">${comment.author.charAt(0)}</div>
-                            <div class="comment-user">${comment.author}</div>
+                            <div class="comment-avatar">${comment.profiles?.username?.charAt(0) || 'U'}</div>
+                            <div class="comment-user">${comment.profiles?.username || 'User'}</div>
                             <div class="comment-time">
                                 <i class="far fa-clock"></i>
                                 <span>${formatTime(comment.created_at)}</span>
@@ -1005,11 +996,11 @@
                         <div class="comment-actions">
                             <button class="action-btn upvote ${this.votedComments.has(comment.id) ? 'active' : ''}" data-comment="${comment.id}">
                                 <i class="fas fa-arrow-up"></i>
-                                <span class="vote-count">${comment.upvotes}</span>
+                                <span class="vote-count">${comment.upvotes || 0}</span>
                             </button>
                             <button class="action-btn downvote" data-comment="${comment.id}">
                                 <i class="fas fa-arrow-down"></i>
-                                <span class="vote-count">${comment.downvotes}</span>
+                                <span class="vote-count">${comment.downvotes || 0}</span>
                             </button>
                             <button class="action-btn">
                                 <i class="fas fa-reply"></i>
@@ -1022,8 +1013,8 @@
             },
 
             updateStats() {
-                const totalComments = samplePosts.reduce((sum, post) => sum + post.comments.length, 0);
-                document.getElementById('totalPosts').textContent = samplePosts.length;
+                const totalComments = this.posts.reduce((sum, post) => sum + (post.comments?.length || 0), 0);
+                document.getElementById('totalPosts').textContent = this.posts.length;
                 document.getElementById('totalComments').textContent = totalComments;
             },
 
@@ -1062,18 +1053,22 @@
 
             setupEventListeners() {
                 // Voting for posts
-                document.addEventListener('click', (e) => {
+                document.addEventListener('click', async (e) => {
                     if (e.target.closest('.upvote[data-post]')) {
                         const button = e.target.closest('.upvote[data-post]');
                         const postId = parseInt(button.getAttribute('data-post'));
-                        const post = samplePosts.find(p => p.id === postId);
+                        const post = this.posts.find(p => p.id === postId);
                         
                         if (post && !this.votedPosts.has(postId)) {
-                            post.upvotes++;
+                            // Update locally
+                            post.upvotes = (post.upvotes || 0) + 1;
                             button.querySelector('.vote-count').textContent = post.upvotes;
                             button.classList.add('active');
                             this.votedPosts.add(postId);
                             this.showNotification("Upvoted post!");
+                            
+                            // Update in database
+                            await this.updatePostVotes(postId, post.upvotes, post.downvotes);
                         } else {
                             this.showNotification("You've already voted on this post", 'warning');
                         }
@@ -1082,14 +1077,18 @@
                     if (e.target.closest('.downvote[data-post]')) {
                         const button = e.target.closest('.downvote[data-post]');
                         const postId = parseInt(button.getAttribute('data-post'));
-                        const post = samplePosts.find(p => p.id === postId);
+                        const post = this.posts.find(p => p.id === postId);
                         
                         if (post && !this.votedPosts.has(postId)) {
-                            post.downvotes++;
+                            // Update locally
+                            post.downvotes = (post.downvotes || 0) + 1;
                             button.querySelector('.vote-count').textContent = post.downvotes;
                             button.classList.add('active');
                             this.votedPosts.add(postId);
                             this.showNotification("Downvoted post!");
+                            
+                            // Update in database
+                            await this.updatePostVotes(postId, post.upvotes, post.downvotes);
                         } else {
                             this.showNotification("You've already voted on this post", 'warning');
                         }
@@ -1101,14 +1100,18 @@
                         const commentId = parseInt(button.getAttribute('data-comment'));
                         
                         if (!this.votedComments.has(commentId)) {
-                            for (const post of samplePosts) {
-                                const comment = post.comments.find(c => c.id === commentId);
+                            for (const post of this.posts) {
+                                const comment = post.comments?.find(c => c.id === commentId);
                                 if (comment) {
-                                    comment.upvotes++;
+                                    // Update locally
+                                    comment.upvotes = (comment.upvotes || 0) + 1;
                                     button.querySelector('.vote-count').textContent = comment.upvotes;
                                     button.classList.add('active');
                                     this.votedComments.add(commentId);
                                     this.showNotification("Upvoted comment!");
+                                    
+                                    // Update in database
+                                    await this.updateCommentVotes(commentId, comment.upvotes, comment.downvotes);
                                     break;
                                 }
                             }
@@ -1122,14 +1125,18 @@
                         const commentId = parseInt(button.getAttribute('data-comment'));
                         
                         if (!this.votedComments.has(commentId)) {
-                            for (const post of samplePosts) {
-                                const comment = post.comments.find(c => c.id === commentId);
+                            for (const post of this.posts) {
+                                const comment = post.comments?.find(c => c.id === commentId);
                                 if (comment) {
-                                    comment.downvotes++;
+                                    // Update locally
+                                    comment.downvotes = (comment.downvotes || 0) + 1;
                                     button.querySelector('.vote-count').textContent = comment.downvotes;
                                     button.classList.add('active');
                                     this.votedComments.add(commentId);
                                     this.showNotification("Downvoted comment!");
+                                    
+                                    // Update in database
+                                    await this.updateCommentVotes(commentId, comment.upvotes, comment.downvotes);
                                     break;
                                 }
                             }
@@ -1147,21 +1154,32 @@
                         const content = textarea.value.trim();
                         
                         if (content) {
-                            const post = samplePosts.find(p => p.id === postId);
-                            if (post) {
+                            try {
+                                // Create a new comment locally
                                 const newComment = {
-                                    id: Math.max(...post.comments.map(c => c.id), 0) + 1,
-                                    author: "User_" + Math.floor(Math.random() * 10000),
+                                    id: Date.now(), // Temporary ID
                                     content,
+                                    created_at: new Date().toISOString(),
                                     upvotes: 0,
                                     downvotes: 0,
-                                    created_at: new Date().toISOString(),
-                                    is_admin: false
+                                    profiles: { username: "You" }
                                 };
-                                post.comments.unshift(newComment);
-                                this.renderPosts();
-                                this.showNotification("Comment posted successfully!");
-                                textarea.value = '';
+                                
+                                // Find the post and add the comment
+                                const post = this.posts.find(p => p.id === postId);
+                                if (post) {
+                                    if (!post.comments) post.comments = [];
+                                    post.comments.unshift(newComment);
+                                    this.renderPosts();
+                                    this.showNotification("Comment posted successfully!");
+                                    textarea.value = '';
+                                    
+                                    // Save to database
+                                    await this.saveComment(postId, content);
+                                }
+                            } catch (error) {
+                                this.showNotification("Failed to post comment", 'error');
+                                console.error("Error posting comment:", error);
                             }
                         } else {
                             this.showNotification("Please enter a comment", 'error');
@@ -1176,6 +1194,47 @@
                         e.target.closest('.comment-form').querySelector('.comment-submit').click();
                     }
                 });
+            },
+            
+            async updatePostVotes(postId, upvotes, downvotes) {
+                try {
+                    const { error } = await supabase
+                        .from(config.postsTable)
+                        .update({ upvotes, downvotes })
+                        .eq('id', postId);
+                    
+                    if (error) throw error;
+                } catch (error) {
+                    console.error('Error updating post votes:', error);
+                }
+            },
+            
+            async updateCommentVotes(commentId, upvotes, downvotes) {
+                try {
+                    const { error } = await supabase
+                        .from(config.commentsTable)
+                        .update({ upvotes, downvotes })
+                        .eq('id', commentId);
+                    
+                    if (error) throw error;
+                } catch (error) {
+                    console.error('Error updating comment votes:', error);
+                }
+            },
+            
+            async saveComment(postId, content) {
+                try {
+                    const { error } = await supabase
+                        .from(config.commentsTable)
+                        .insert([{ 
+                            post_id: postId, 
+                            content: content 
+                        }]);
+                    
+                    if (error) throw error;
+                } catch (error) {
+                    console.error('Error saving comment:', error);
+                }
             }
         };
 
