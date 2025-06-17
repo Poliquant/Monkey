@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Prompt Monkeys</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="console.log('Font Awesome loaded')" onerror="console.error('Failed to load Font Awesome')">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" onload="console.log('Supabase JS loaded')" onerror="console.error('Failed to load Supabase JS')"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
     <style>
         :root {
             --primary: #1DB954;
@@ -351,14 +351,24 @@
         async function isUserAdmin(user) {
             try {
                 console.log('[AUTH] Checking admin status for user:', user.email, 'ID:', user.id);
-                const rawMetadata = user.raw_user_meta_data || {};
-                const isSuperAdmin = rawMetadata.is_super_admin;
-                const isAdmin = String(isSuperAdmin).toLowerCase() === 'true';
+                
+                // Fetch the user's profile from the profiles table
+                const { data: profile, error } = await state.supabase
+                    .from('profiles')
+                    .select('is_super_admin')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error) {
+                    console.warn('[AUTH] Failed to fetch user profile:', error);
+                    return false;
+                }
+
+                const isAdmin = profile?.is_super_admin === true;
 
                 console.log('[AUTH] Admin check:', {
                     email: user.email,
-                    raw_user_meta_data: JSON.stringify(rawMetadata, null, 2),
-                    is_super_admin: isSuperAdmin,
+                    is_super_admin: profile?.is_super_admin,
                     is_admin: isAdmin
                 });
 
