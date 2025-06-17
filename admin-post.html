@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Post Creation | Prompt Monkeys</title>
+  <title>Prompt Monkeys - Admin Posts</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <style>
@@ -79,67 +79,79 @@
       margin-bottom: 10px;
     }
     
-    .post-form {
+    .post {
       background-color: var(--card-bg);
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
-    
-    .form-group {
       margin-bottom: 20px;
     }
     
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
+    .post-title {
+      color: var(--primary);
+      margin-bottom: 15px;
+      font-size: 1.3rem;
     }
     
-    .form-control {
-      width: 100%;
-      padding: 12px 15px;
-      background-color: var(--background);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-size: 1rem;
-      transition: border-color 0.3s;
+    .post-content {
+      color: var(--text-light);
+      margin-bottom: 20px;
+      line-height: 1.7;
     }
     
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary);
+    .post-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
     }
     
-    textarea.form-control {
-      min-height: 200px;
-      resize: vertical;
+    .post-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
     }
     
-    .btn {
+    .action-btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       background: var(--primary);
       color: white;
-      padding: 12px 25px;
+      padding: 8px 15px;
       border-radius: 6px;
       text-decoration: none;
-      font-weight: bold;
-      font-size: 1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
       border: none;
       cursor: pointer;
       transition: background 0.3s;
     }
     
-    .btn:hover {
+    .action-btn:hover {
       background: var(--primary-dark);
     }
     
-    .btn-block {
-      width: 100%;
+    .loading {
+      display: flex;
       justify-content: center;
+      padding: 40px;
+    }
+    
+    .loading-spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary);
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     
     .notification {
@@ -177,7 +189,7 @@
         padding: 0 15px;
       }
       
-      .post-form {
+      .post {
         padding: 20px;
       }
       
@@ -197,125 +209,169 @@
 
   <div class="admin-container">
     <div class="admin-header">
-      <h2><i class="fas fa-plus-circle"></i> Create New Post</h2>
-      <p>Create and publish new content for the community</p>
+      <h2><i class="fas fa-newspaper"></i> Admin Posts</h2>
+      <p>Latest content from our administrators</p>
     </div>
 
-    <form id="postForm" class="post-form">
-      <div class="form-group">
-        <label for="title">Post Title</label>
-        <input type="text" id="title" class="form-control" placeholder="Enter post title" required>
+    <div id="adminPostFeed">
+      <div class="loading">
+        <div class="loading-spinner"></div>
       </div>
-
-      <div class="form-group">
-        <label for="content">Post Content</label>
-        <textarea id="content" class="form-control" placeholder="Write your post content here..." required></textarea>
-      </div>
-
-      <button type="submit" class="btn btn-block">
-        <i class="fas fa-paper-plane"></i> Publish Post
-      </button>
-    </form>
+    </div>
   </div>
 
   <div id="notification" class="notification"></div>
 
   <script>
-    const config = {
-      supabaseUrl: 'https://tdwerbqbgcmszolvjvca.supabase.co',
-      supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8',
-      redirectIfNotAdmin: '/Monkey/login.html',
-      notificationTimeout: 3000
+    // Supabase configuration
+    const supabase = window.supabase.createClient(
+      'https://tdwerbqbgcmszolvjvca.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8'
+    );
+
+    // State management
+    const state = {
+      votedPosts: new Set()
     };
 
-    let state = {
-      supabase: null,
-      currentUser: null
-    };
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      initializeSupabase();
-      await checkUserAuth();
-      setupPostForm();
-    });
-
-    function initializeSupabase() {
-      state.supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseKey);
-    }
-
-    async function checkUserAuth() {
-      const { data: { user }, error: authError } = await state.supabase.auth.getUser();
+    // Format time function
+    function formatTime(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - date) / 1000);
       
-      if (!user || authError) {
-        window.location.href = config.redirectIfNotAdmin;
-        return;
-      }
-
-      const { data: profile, error: profileError } = await state.supabase
-        .from('profiles')
-        .select('is_super_admin')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError || !profile?.is_super_admin) {
-        window.location.href = config.redirectIfNotAdmin;
-        return;
-      }
-
-      state.currentUser = user;
-      document.getElementById('postForm').style.display = 'block';
+      if (diffInSeconds < 60) return `${diffInSeconds}s ago`;
+      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+      if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
-    function setupPostForm() {
-      const form = document.getElementById('postForm');
-      if (!form) return;
-
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const title = document.getElementById('title').value.trim();
-        const content = document.getElementById('content').value.trim();
-
-        if (!title || !content) {
-          showNotification('Title and content are required', true);
-          return;
-        }
-
-        try {
-          const { error } = await state.supabase.from('posts').insert({
-            title,
-            content,
-            author_id: state.currentUser.id
-          });
-
-          if (error) {
-            showNotification('Failed to post: ' + error.message, true);
-          } else {
-            showNotification('Post published successfully!');
-            form.reset();
-          }
-        } catch (err) {
-          showNotification('An unexpected error occurred', true);
-          console.error('Post submission error:', err);
-        }
-      });
-    }
-
+    // Show notification
     function showNotification(message, isError = false) {
-      const note = document.getElementById('notification');
-      if (!note) return;
-
-      note.innerHTML = `
+      const notification = document.getElementById('notification');
+      notification.innerHTML = `
         <i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
         <span>${message}</span>
       `;
-
-      note.className = `notification ${isError ? 'error' : 'success'} show`;
-
+      notification.className = `notification ${isError ? 'error' : 'success'} show`;
+      
       setTimeout(() => {
-        note.classList.remove('show');
-      }, config.notificationTimeout);
+        notification.classList.remove('show');
+      }, 3000);
     }
+
+    // Load admin posts
+    async function loadAdminPosts() {
+      try {
+        const { data, error } = await supabase
+          .from('posts')
+          .select('id, title, content, created_at, upvotes, downvotes, profiles(username)')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        renderPosts(data);
+      } catch (error) {
+        console.error('Failed to load posts:', error);
+        showNotification('Failed to load posts', true);
+        document.getElementById('adminPostFeed').innerHTML = `
+          <div class="post">
+            <div class="post-content" style="text-align: center; padding: 40px 15px;">
+              <h3 style="color: var(--primary); margin-bottom: 15px;">Error Loading Posts</h3>
+              <p>Please try again later</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Render posts
+    function renderPosts(posts) {
+      const container = document.getElementById('adminPostFeed');
+      container.innerHTML = '';
+
+      if (!posts || posts.length === 0) {
+        container.innerHTML = `
+          <div class="post">
+            <div class="post-content" style="text-align: center; padding: 40px 15px;">
+              <h3 style="color: var(--primary); margin-bottom: 15px;">No Posts Yet</h3>
+              <p>Check back later for new content</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      posts.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.className = 'post';
+        postElement.innerHTML = `
+          <h3 class="post-title">${post.title}</h3>
+          <div class="post-content">${post.content}</div>
+          <div class="post-meta">
+            <span>Posted by ${post.profiles?.username || 'Admin'}</span>
+            <span>${formatTime(post.created_at)}</span>
+          </div>
+          <div class="post-actions">
+            <button class="action-btn upvote-btn ${state.votedPosts.has(post.id) ? 'active' : ''}" 
+                    data-post-id="${post.id}" data-vote-type="upvote">
+              <i class="fas fa-thumbs-up"></i>
+              <span class="upvote-count">${post.upvotes || 0}</span>
+            </button>
+            <button class="action-btn downvote-btn" 
+                    data-post-id="${post.id}" data-vote-type="downvote">
+              <i class="fas fa-thumbs-down"></i>
+              <span class="downvote-count">${post.downvotes || 0}</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(postElement);
+      });
+
+      // Add event listeners to vote buttons
+      document.querySelectorAll('.upvote-btn, .downvote-btn').forEach(button => {
+        button.addEventListener('click', handleVote);
+      });
+    }
+
+    // Handle vote
+    async function handleVote(event) {
+      const button = event.currentTarget;
+      const postId = button.getAttribute('data-post-id');
+      const voteType = button.getAttribute('data-vote-type');
+
+      if (state.votedPosts.has(postId)) {
+        showNotification("You've already voted on this post", true);
+        return;
+      }
+
+      try {
+        // Update UI immediately
+        const countElement = button.querySelector(`.${voteType}-count`);
+        const currentCount = parseInt(countElement.textContent);
+        countElement.textContent = currentCount + 1;
+        button.classList.add('active');
+        state.votedPosts.add(postId);
+
+        // Update in database
+        const updateField = voteType === 'upvote' ? 'upvotes' : 'downvotes';
+        const { error } = await supabase
+          .from('posts')
+          .update({ [updateField]: currentCount + 1 })
+          .eq('id', postId);
+
+        if (error) throw error;
+
+        showNotification(`Post ${voteType}d successfully!`);
+      } catch (error) {
+        console.error('Error updating vote:', error);
+        showNotification('Failed to update vote', true);
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', loadAdminPosts);
   </script>
 </body>
 </html>
