@@ -29,7 +29,7 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
             padding: 1rem;
             overflow-x: hidden;
         }
@@ -39,6 +39,7 @@
             justify-content: center;
             padding: 1rem;
             animation: fadeIn 1s ease-out;
+            margin-bottom: 2rem;
         }
         .logo {
             display: flex;
@@ -65,7 +66,7 @@
             border-radius: 1rem;
             width: 100%;
             max-width: 28rem;
-            margin: auto;
+            margin: 0 auto;
             box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.1);
             animation: slideUp 0.8s ease-out;
@@ -161,6 +162,7 @@
             text-align: center;
             color: var(--text-light);
             font-size: 0.875rem;
+            margin-top: 2rem;
         }
         .footer a {
             color: var(--primary);
@@ -214,7 +216,7 @@
     <header class="header">
         <div class="logo">
             <i class="fas fa-monkey"></i>
-            <h1>Prompt Monkeys</h1>
+            <h1>Prompt Monkeys Admin</h1>
         </div>
     </header>
 
@@ -293,7 +295,7 @@
             }
         }
 
-        // Check super admin status
+        // Check super admin status - FIXED to look at top-level property
         async function checkSuperAdmin(user) {
             if (!user) {
                 console.error('No user provided');
@@ -302,28 +304,18 @@
             console.log('Checking super admin status for:', user.email);
             console.log('Full user object:', JSON.stringify(user, null, 2));
 
-            const rawMetadata = user.raw_user_meta_data || {};
-            const isSuperAdmin = rawMetadata.is_super_admin;
-            const isAdmin = String(isSuperAdmin).toLowerCase() === 'true';
-
-            console.log('Super admin check:', {
-                email: user.email,
-                raw_user_meta_data: JSON.stringify(rawMetadata, null, 2),
-                is_super_admin: isSuperAdmin,
-                is_admin: isAdmin
-            });
+            // CORRECTED: Access is_super_admin directly from user object
+            const isAdmin = user.is_super_admin === true;
+            console.log('Super admin status:', isAdmin);
 
             if (isAdmin) {
                 console.log(`${user.email} is a super admin`);
                 return true;
             } else {
                 console.log(`${user.email} is not a super admin`);
-                try {
-                    await supabase.auth.signOut();
-                    console.log('Non-admin user signed out');
-                } catch (signOutError) {
-                    console.error('Sign out error:', signOutError.message);
-                }
+                // Sign out the non-admin user
+                await supabase.auth.signOut();
+                console.log('Non-admin user signed out');
                 throw new Error('Access denied: Not a super admin');
             }
         }
@@ -361,14 +353,16 @@
                 }
 
                 loginButton.disabled = true;
-                loginButton.textContent = 'Logging in...';
+                loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
 
                 try {
                     const isAdmin = await handleLogin(email, password);
                     if (isAdmin) {
-                        showNotification('Login successful! Redirecting...');
-                        console.log('Redirecting to /Monkey/admin-portal.html');
-                        setTimeout(() => window.location.assign('/Monkey/admin-portal.html'), 1000);
+                        showNotification('Login successful! Redirecting to admin portal...');
+                        console.log('Redirecting to admin portal');
+                        setTimeout(() => {
+                            window.location.assign('/Monkey/admin-portal.html');
+                        }, 1500);
                     }
                 } catch (error) {
                     showNotification(error.message, true);
