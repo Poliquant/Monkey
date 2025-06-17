@@ -280,14 +280,13 @@
             }, 3000);
         }
 
-        // Handle login and admin verification
+        // Fixed handleLogin function with proper admin check
         async function handleLogin(email, password) {
             if (!supabase) {
                 throw new Error('Database connection not established');
             }
             
             try {
-                // Authenticate user
                 const { data: { user, session }, error } = await supabase.auth.signInWithPassword({
                     email,
                     password
@@ -299,8 +298,18 @@
                         : error.message);
                 }
 
-                // Verify admin status
-                if (!user.is_super_admin) {
+                // Enhanced admin check that handles string 'true' or boolean true
+                const isAdmin = user.is_super_admin === true || 
+                               String(user.is_super_admin).toLowerCase() === 'true';
+
+                console.log('Admin check results:', {
+                    email: user.email,
+                    is_super_admin: user.is_super_admin,
+                    type: typeof user.is_super_admin,
+                    isAdmin: isAdmin
+                });
+
+                if (!isAdmin) {
                     await supabase.auth.signOut();
                     throw new Error('Access denied: Administrator privileges required');
                 }
