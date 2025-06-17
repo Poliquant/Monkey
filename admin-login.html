@@ -147,6 +147,9 @@
             z-index: 1000;
             transform: translateX(120%);
             transition: transform 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         .notification.show {
             transform: translateX(0);
@@ -248,9 +251,10 @@
     </footer>
 
     <script>
-        // Initialize Supabase client
+        // Initialize Supabase client with your credentials
         const supabaseUrl = 'https://tdwerbqbgcmszolvjvca.supabase.co';
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkd2VyYnFiZ2Ntc3pvbHZqdmNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyNDE3MjgsImV4cCI6MjA2NDgxNzcyOH0.vMY-dVrQ4qYLsOACAYeQq0GHU-8YSSFzew6jSJeIxc8';
+        
         let supabase = null;
 
         try {
@@ -258,100 +262,90 @@
             console.log('Supabase initialized successfully');
         } catch (error) {
             console.error('Supabase init error:', error.message);
-            showNotification('Failed to initialize Supabase client', true);
+            showNotification('Failed to initialize database connection', true);
         }
 
-        // Show notification
+        // Show notification function
         function showNotification(message, isError = false) {
-            console.log('Notification:', message, 'Error:', isError);
             const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.classList.toggle('error', isError);
-            notification.classList.toggle('success', !isError);
+            notification.innerHTML = `
+                <i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+                ${message}
+            `;
+            notification.className = `notification ${isError ? 'error' : 'success'}`;
             notification.classList.add('show');
-            setTimeout(() => notification.classList.remove('show'), 3000);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
 
-        // Handle login and admin check
+        // Handle login and admin verification
         async function handleLogin(email, password) {
             if (!supabase) {
-                throw new Error('Supabase client not initialized');
+                throw new Error('Database connection not established');
             }
-            console.log('Attempting login for:', email);
+            
             try {
-                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                // Authenticate user
+                const { data: { user, session }, error } = await supabase.auth.signInWithPassword({
                     email,
                     password
                 });
-                if (authError) {
-                    console.error('Authentication error:', authError.message);
-                    throw new Error('Invalid email or password');
+
+                if (error) {
+                    throw new Error(error.message.includes('Invalid') 
+                        ? 'Invalid email or password' 
+                        : error.message);
                 }
-                console.log('Login successful, user:', authData.user.email, 'ID:', authData.user.id);
-                return await checkSuperAdmin(authData.user);
+
+                // Verify admin status
+                if (!user.is_super_admin) {
+                    await supabase.auth.signOut();
+                    throw new Error('Access denied: Administrator privileges required');
+                }
+
+                return true;
             } catch (error) {
-                console.error('Login error:', error.message);
+                console.error('Login error:', error);
                 throw error;
             }
         }
 
-        // Check super admin status - FIXED to look at top-level property
-        async function checkSuperAdmin(user) {
-            if (!user) {
-                console.error('No user provided');
-                throw new Error('No user logged in');
-            }
-            console.log('Checking super admin status for:', user.email);
-            console.log('Full user object:', JSON.stringify(user, null, 2));
-
-            // CORRECTED: Access is_super_admin directly from user object
-            const isAdmin = user.is_super_admin === true;
-            console.log('Super admin status:', isAdmin);
-
-            if (isAdmin) {
-                console.log(`${user.email} is a super admin`);
-                return true;
-            } else {
-                console.log(`${user.email} is not a super admin`);
-                // Sign out the non-admin user
-                await supabase.auth.signOut();
-                console.log('Non-admin user signed out');
-                throw new Error('Access denied: Not a super admin');
-            }
-        }
-
-        // Form submission
+        // Form submission handler
         document.addEventListener('DOMContentLoaded', () => {
             const loginForm = document.getElementById('loginForm');
             const loginButton = document.getElementById('loginButton');
 
-            if (!loginForm || !loginButton) {
-                console.error('Form or button not found');
-                showNotification('Form error', true);
-                return;
-            }
-
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                console.log('Form submitted');
-
+                
                 const email = document.getElementById('email').value.trim();
                 const password = document.getElementById('password').value.trim();
                 const emailError = document.getElementById('email-error');
                 const passwordError = document.getElementById('password-error');
 
+                // Reset errors
                 emailError.style.display = 'none';
                 passwordError.style.display = 'none';
 
+                // Validate inputs
+                let isValid = true;
                 if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                     emailError.style.display = 'block';
-                    return;
+                    isValid = false;
                 }
-                if (!password) {
+                if (!password || password.length < 8) {
                     passwordError.style.display = 'block';
-                    return;
+                    passwordError.textContent = password.length < 8 
+                        ? 'Password must be at least 8 characters' 
+                        : 'Password required';
+                    isValid = false;
                 }
 
+                if (!isValid) return;
+
+                // Update UI for loading state
                 loginButton.disabled = true;
                 loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
 
@@ -359,9 +353,8 @@
                     const isAdmin = await handleLogin(email, password);
                     if (isAdmin) {
                         showNotification('Login successful! Redirecting to admin portal...');
-                        console.log('Redirecting to admin portal');
                         setTimeout(() => {
-                            window.location.assign('/Monkey/admin-portal.html');
+                            window.location.href = '/Monkey/admin-portal.html';
                         }, 1500);
                     }
                 } catch (error) {
