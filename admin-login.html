@@ -239,14 +239,6 @@
             </div>
             <button type="submit" id="loginButton"><i class="fas fa-sign-in-alt"></i> Login</button>
         </form>
-        
-        <div style="margin-top: 20px; text-align: center;">
-            <p style="color: var(--text-light); font-size: 0.9rem;">
-                <strong>Test Admin Credentials:</strong><br>
-                Email: testadmin@promptmonkeys.com<br>
-                Password: AdminTest123!
-            </p>
-        </div>
     </div>
 
     <footer class="footer">
@@ -288,7 +280,7 @@
             }, 3000);
         }
 
-        // Fixed handleLogin function with direct admin check
+        // Fixed handleLogin function using profiles table
         async function handleLogin(email, password) {
             if (!supabase) {
                 throw new Error('Database connection not established');
@@ -307,26 +299,26 @@
                         : error.message);
                 }
 
-                // Directly query the users table for admin status
-                const { data: adminData, error: adminError } = await supabase
-                    .from('users')
+                // Query the profiles table for admin status
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
                     .select('is_super_admin')
                     .eq('id', user.id)
                     .single();
 
-                if (adminError) {
-                    console.error('Admin check error:', adminError);
-                    throw new Error('Failed to verify admin privileges');
+                if (profileError) {
+                    console.error('Profile query error:', profileError);
+                    throw new Error('Failed to retrieve admin status');
                 }
 
                 // Robust admin check
-                const isAdmin = adminData.is_super_admin === true || 
-                               String(adminData.is_super_admin).toLowerCase() === 'true';
+                const isAdmin = profile.is_super_admin === true || 
+                               String(profile.is_super_admin).toLowerCase() === 'true';
 
                 console.log('Admin check results:', {
                     email: user.email,
-                    is_super_admin: adminData.is_super_admin,
-                    type: typeof adminData.is_super_admin,
+                    is_super_admin: profile.is_super_admin,
+                    type: typeof profile.is_super_admin,
                     isAdmin: isAdmin
                 });
 
